@@ -1,0 +1,9 @@
+{
+  "name": "ISARD - Randonnée & IA",
+  "description": "Application de randonnée sociale avec cartographie réelle et identification IA.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
