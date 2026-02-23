@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isard — La randonnée augmentée en Occitanie</title>
+<meta name="description" content="Isard transforme chaque randonnée en expérience immersive grâce à la réalité augmentée. Faune, flore, patrimoine — explorez l'Occitanie comme jamais.">
+<meta property="og:title" content="Isard — La randonnée augmentée">
+<meta property="og:description" content="Explorez la nature comme jamais avec la réalité augmentée.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--lime:#CCFF00;--lime-d:#a8d400;--black:#010101;--white:#FDFDFD;--dark:#080808;--d2:#0f0f0f;--d3:#161616;--d4:#1c1c1c;--gray:#777;--gl:#999;--ld:rgba(204,255,0,0.1);--lg:rgba(204,255,0,0.25);--r:20px;--t:cubic-bezier(0.16,1,0.3,1)}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+.container{max-width:1200px;margin:0 auto}
+
+/* Noise */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:99999}
+.cursor-glow{position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(204,255,0,0.05) 0%,transparent 70%);pointer-events:none;z-index:9998;transform:translate(-50%,-50%)}
+
+/* Reveals */
+.r{opacity:0;transform:translateY(50px);transition:opacity .8s var(--t),transform .8s var(--t)}.r.v{opacity:1;transform:translateY(0)}
+.rl{opacity:0;transform:translateX(-60px);transition:opacity .8s var(--t),transform .8s var(--t)}.rl.v{opacity:1;transform:translateX(0)}
+.rr{opacity:0;transform:translateX(60px);transition:opacity .8s var(--t),transform .8s var(--t)}.rr.v{opacity:1;transform:translateX(0)}
+.rs{opacity:0;transform:scale(.85);transition:opacity .8s var(--t),transform .8s var(--t)}.rs.v{opacity:1;transform:scale(1)}
+.d1{transition-delay:.1s!important}.d2{transition-delay:.2s!important}.d3{transition-delay:.3s!important}.d4{transition-delay:.4s!important}.d5{transition-delay:.5s!important}.d6{transition-delay:.6s!important}.d7{transition-delay:.7s!important}
+
+/* ===== NAV ===== */
+nav{position:fixed;top:0;left:0;right:0;z-index:10000;padding:18px 32px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(24px) saturate(180%);background:rgba(8,8,8,0.6);border-bottom:1px solid rgba(204,255,0,0.05);transition:all .5s var(--t)}
+nav.scrolled{padding:12px 32px;background:rgba(8,8,8,0.95)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-size:1.5rem;font-weight:800;letter-spacing:-.03em;z-index:10002;cursor:pointer}
+.logo-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;transition:transform .3s;overflow:hidden}
+.logo-icon:hover{transform:rotate(-8deg) scale(1.08)}
+.logo-icon img{width:100%;height:100%;object-fit:cover;border-radius:11px}
+.nav-links{display:flex;gap:28px;align-items:center;list-style:none}
+.nav-links a{font-size:.82rem;font-weight:500;color:var(--gl);letter-spacing:.01em;transition:color .3s;position:relative;cursor:pointer}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--lime);transition:width .3s var(--t)}
+.nav-links a:hover{color:var(--lime)}.nav-links a:hover::after{width:100%}
+.ncta span{background:var(--lime);color:var(--black);padding:10px 24px;border-radius:50px;font-weight:700;font-size:.82rem;transition:all .3s;display:inline-block}
+.ncta span:hover{box-shadow:0 0 30px rgba(204,255,0,0.4);transform:translateY(-2px)}
+.ncta a::after{display:none!important}
+
+.hamburger{display:none;flex-direction:column;gap:6px;cursor:pointer;z-index:10002;padding:8px;background:none;border:none}
+.hamburger span{display:block;width:28px;height:2px;background:var(--white);border-radius:2px;transition:all .4s var(--t);transform-origin:center}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,6px);background:var(--lime)}
+.hamburger.active span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-6px);background:var(--lime)}
+.mobile-menu{position:fixed;inset:0;background:rgba(1,1,1,0.97);z-index:10001;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity .5s;backdrop-filter:blur(30px)}
+.mobile-menu.open{opacity:1;pointer-events:all}
+.mobile-menu a{font-size:1.8rem;font-weight:700;color:var(--white);padding:14px 0;transition:all .3s;transform:translateY(30px);opacity:0;display:block;cursor:pointer}
+.mobile-menu.open a{transform:translateY(0);opacity:1}
+.mobile-menu.open a:nth-child(1){transition-delay:.1s}.mobile-menu.open a:nth-child(2){transition-delay:.15s}.mobile-menu.open a:nth-child(3){transition-delay:.2s}.mobile-menu.open a:nth-child(4){transition-delay:.25s}.mobile-menu.open a:nth-child(5){transition-delay:.3s}.mobile-menu.open a:nth-child(6){transition-delay:.35s}.mobile-menu.open a:nth-child(7){transition-delay:.4s}
+.mobile-menu a:hover{color:var(--lime)}
+.mobile-menu .mcta{color:var(--black);background:var(--lime);padding:14px 40px;border-radius:50px;margin-top:16px;font-size:1.1rem}
+
+/* ===== SHARED SECTION STYLES ===== */
+section{padding:120px 32px;position:relative}
+.slabel{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:var(--lime);margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.slabel::before{content:'';width:32px;height:1px;background:var(--lime)}
+.slabel.ctr{justify-content:center}.slabel.ctr::before{display:none}
+.stitle{font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-.03em;line-height:1.12;margin-bottom:18px}
+.stitle .a{color:var(--lime);font-family:'Playfair Display',serif}
+.sdesc{font-size:1rem;color:var(--gl);max-width:540px;line-height:1.75;font-weight:300}
+
+/* Buttons */
+.btn-p{display:inline-flex;align-items:center;gap:10px;background:var(--lime);color:var(--black);padding:16px 36px;border-radius:60px;font-size:.95rem;font-weight:700;border:none;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .4s var(--t);position:relative;overflow:hidden}
+.btn-p::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,0.2),transparent);transform:translateX(-100%);transition:transform .6s}
+.btn-p:hover::before{transform:translateX(100%)}.btn-p:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(204,255,0,0.35)}
+.btn-g{display:inline-flex;align-items:center;gap:10px;background:transparent;color:var(--white);padding:16px 36px;border-radius:60px;font-size:.95rem;font-weight:500;border:1px solid rgba(255,255,255,0.12);cursor:pointer;font-family:'Poppins',sans-serif;transition:all .4s}
+.btn-g:hover{border-color:var(--lime);color:var(--lime);background:rgba(204,255,0,0.04);transform:translateY(-2px)}
+
+/* ===== PAGE SYSTEM ===== */
+.page{display:none}
+.page.active{display:block}
+
+/* ===== HERO ===== */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:140px 32px 60px;overflow:hidden}
+.hero-orb{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(204,255,0,0.12),rgba(204,255,0,0.02) 60%,transparent 80%);top:50%;left:50%;transform:translate(-50%,-50%);animation:orb 8s ease-in-out infinite;filter:blur(60px)}
+@keyframes orb{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.15);opacity:1}}
+.particles{position:absolute;inset:0;z-index:1;overflow:hidden}
+.particle{position:absolute;background:var(--lime);border-radius:50%;opacity:0;animation:pf linear infinite}
+@keyframes pf{0%{opacity:0;transform:translateY(100vh)}10%{opacity:.5}90%{opacity:.2}100%{opacity:0;transform:translateY(-10vh)}}
+.hero-mountains{position:absolute;bottom:0;left:0;right:0;height:100%;pointer-events:none}
+.mountain-layer{position:absolute;bottom:0;left:-5%;width:110%}
+.hero-content{position:relative;z-index:2;max-width:880px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--ld);border:1px solid rgba(204,255,0,0.15);padding:8px 22px;border-radius:50px;font-size:.78rem;font-weight:500;color:var(--lime);margin-bottom:36px;animation:bp 3s ease-in-out infinite alternate}
+@keyframes bp{from{box-shadow:0 0 15px rgba(204,255,0,0.05)}to{box-shadow:0 0 30px rgba(204,255,0,0.15)}}
+.bdot{width:6px;height:6px;background:var(--lime);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:clamp(2.8rem,6.5vw,5.2rem);font-weight:900;line-height:1.06;letter-spacing:-.04em;margin-bottom:28px}
+.hl{display:block;overflow:hidden}
+.hli{display:inline-block;transform:translateY(120%);animation:lr 1s var(--t) forwards}
+.hl:nth-child(2) .hli{animation-delay:.15s}
+@keyframes lr{to{transform:translateY(0)}}
+.hi{color:var(--lime);position:relative;font-family:'Playfair Display',serif}
+.hi::after{content:'';position:absolute;bottom:2px;left:-2%;width:0;height:8px;background:rgba(204,255,0,0.2);border-radius:4px;animation:hg .8s .8s var(--t) forwards}
+@keyframes hg{to{width:104%}}
+.hero-sub{font-size:clamp(.95rem,1.8vw,1.15rem);color:var(--gl);max-width:560px;margin:0 auto 44px;line-height:1.75;font-weight:300;opacity:0;animation:fu .8s .5s var(--t) forwards}
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;opacity:0;animation:fu .8s .65s var(--t) forwards}
+.hero-stats{display:flex;justify-content:center;gap:56px;margin-top:72px;padding-top:36px;border-top:1px solid rgba(255,255,255,0.05);opacity:0;animation:fu .8s .85s var(--t) forwards}
+.hero-stat .num{font-size:2.4rem;font-weight:900;color:var(--lime);letter-spacing:-.03em;font-family:'Playfair Display',serif}
+.hero-stat .label{font-size:.75rem;color:var(--gray);margin-top:2px}
+.scroll-ind{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fu .8s 1.2s var(--t) forwards}
+.scroll-ind span{font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--gray)}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--lime),transparent);animation:sl 2s infinite}
+@keyframes sl{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* Marquee */
+.marquee-s{overflow:hidden;border-top:1px solid rgba(204,255,0,0.06);border-bottom:1px solid rgba(204,255,0,0.06);padding:0}
+.mtrack{display:flex;animation:mq 30s linear infinite;padding:22px 0}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mitem{display:flex;align-items:center;gap:32px;padding:0 32px;white-space:nowrap;font-size:.85rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,0.1)}
+.mdot{width:5px;height:5px;background:var(--lime);border-radius:50%;opacity:.5;flex-shrink:0}
+
+/* Features grid */
+.feat-s{background:var(--d2)}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.fcard{background:var(--d3);padding:44px 32px;position:relative;overflow:hidden;transition:all .5s var(--t);cursor:default;border:1px solid transparent}
+.fcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--lime),var(--lime-d));transform:scaleX(0);transform-origin:left;transition:transform .6s var(--t)}
+.fcard:hover::before{transform:scaleX(1)}
+.fcard:hover{background:var(--d4);transform:translateY(-6px);border-color:rgba(204,255,0,0.06);box-shadow:0 20px 50px rgba(0,0,0,0.3)}
+.ficon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,rgba(204,255,0,0.12),rgba(204,255,0,0.04));display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:24px;transition:all .4s var(--t)}
+.fcard:hover .ficon{background:var(--lime);transform:scale(1.12) rotate(-5deg);box-shadow:0 8px 20px rgba(204,255,0,0.25)}
+.fnum{position:absolute;top:16px;right:20px;font-size:3.5rem;font-weight:900;color:rgba(255,255,255,0.015);line-height:1;font-family:'Playfair Display',serif;transition:color .4s}
+.fcard:hover .fnum{color:rgba(204,255,0,0.04)}
+.fcard h3{font-size:1.1rem;font-weight:700;margin-bottom:10px}
+.fcard p{font-size:.85rem;color:var(--gray);line-height:1.7;font-weight:300}
+
+/* Steps */
+.how-s{background:var(--dark)}
+.steps-c{position:relative}
+.sline{position:absolute;top:52px;left:12%;right:12%;height:2px;background:rgba(204,255,0,0.08);overflow:hidden}
+.sline-f{height:100%;width:0;background:var(--lime);transition:width 1.5s var(--t)}.sline-f.anim{width:100%}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);position:relative;z-index:1}
+.step{text-align:center;padding:0 16px}
+.step-c{width:104px;height:104px;border-radius:50%;background:var(--d3);border:2px solid rgba(204,255,0,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:2rem;transition:all .5s var(--t)}
+.step:hover .step-c{border-color:var(--lime);background:rgba(204,255,0,0.08);transform:scale(1.1)}
+.step h4{font-size:1rem;font-weight:700;margin-bottom:8px}
+.step p{font-size:.82rem;color:var(--gray);line-height:1.6;font-weight:300}
+
+/* Showcase */
+.show-s{background:var(--d2);overflow:hidden;padding:140px 32px}
+.show-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.show-vis{position:relative;display:flex;justify-content:center;align-items:center;min-height:560px}
+.phone-w{position:relative;will-change:transform}
+.phone{width:280px;height:580px;background:#0c0c0c;border-radius:44px;border:2.5px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;box-shadow:0 50px 100px rgba(0,0,0,0.5),0 0 80px rgba(204,255,0,0.06);animation:pfl 7s ease-in-out infinite}
+@keyframes pfl{0%,100%{transform:translateY(0)}33%{transform:translateY(-12px) rotate(.5deg)}66%{transform:translateY(-6px) rotate(-.3deg)}}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100px;height:28px;background:#0c0c0c;border-radius:0 0 18px 18px;z-index:3}
+.phone-scr{position:absolute;inset:8px;border-radius:38px;overflow:hidden;background:linear-gradient(165deg,#152808,#0a1505 40%,#090909)}
+.phone-cnt{padding:46px 18px 14px;height:100%;display:flex;flex-direction:column}
+.phone-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.phone-brand{font-weight:800;font-size:.85rem;color:var(--lime)}
+.phone-loc{font-size:.6rem;color:var(--gray)}
+.phone-map{flex:1;border-radius:14px;background:linear-gradient(140deg,#1a2e0a,#0a1504);position:relative;overflow:hidden;margin-bottom:12px}
+.phone-map-g{position:absolute;inset:0;background:linear-gradient(rgba(204,255,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(204,255,0,0.03) 1px,transparent 1px);background-size:24px 24px}
+.trail-svg{position:absolute;inset:10%}
+.trail-svg svg{width:100%;height:100%}
+.trail-m{fill:none;stroke:var(--lime);stroke-width:3;stroke-linecap:round;stroke-dasharray:400;stroke-dashoffset:400;animation:dp 5s ease-in-out infinite;filter:drop-shadow(0 0 6px rgba(204,255,0,0.4))}
+.trail-sh{fill:none;stroke:rgba(204,255,0,0.1);stroke-width:10;stroke-linecap:round;stroke-dasharray:400;stroke-dashoffset:400;animation:dp 5s ease-in-out infinite}
+@keyframes dp{0%{stroke-dashoffset:400}50%{stroke-dashoffset:0}100%{stroke-dashoffset:-400}}
+.mpin{position:absolute;width:14px;height:14px;background:var(--lime);border-radius:50%;box-shadow:0 0 12px rgba(204,255,0,0.5)}
+.mpin::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(204,255,0,0.2);animation:pr 2s infinite}
+@keyframes pr{0%{transform:scale(1);opacity:1}100%{transform:scale(2);opacity:0}}
+.mpin.p1{top:22%;left:18%}.mpin.p2{top:48%;left:52%}.mpin.p3{top:72%;left:76%}
+.arl{position:absolute;background:rgba(8,8,8,0.88);backdrop-filter:blur(12px);border:1px solid rgba(204,255,0,0.2);border-radius:10px;padding:6px 10px;display:flex;align-items:center;gap:6px;font-size:.55rem;font-weight:500;animation:ap 4s ease-in-out infinite}
+.arl.l1{top:28%;right:8%;animation-delay:.3s}.arl.l2{bottom:32%;left:5%;animation-delay:1.8s}
+@keyframes ap{0%,100%{opacity:.6;transform:scale(.95)}50%{opacity:1;transform:scale(1.02)}}
+.ardot{width:5px;height:5px;border-radius:50%;background:var(--lime)}
+.phone-tabs{display:flex;justify-content:space-around;padding:10px 0 2px;border-top:1px solid rgba(255,255,255,0.04)}
+.ptab{width:22px;height:22px;border-radius:7px;background:rgba(255,255,255,0.04)}.ptab.act{background:var(--lime);box-shadow:0 0 10px rgba(204,255,0,0.3)}
+.orbit{position:absolute;border:1px solid rgba(204,255,0,0.04);border-radius:50%;top:50%;left:50%}
+.orbit.o1{width:400px;height:400px;margin:-200px 0 0 -200px;animation:or 25s linear infinite}
+.orbit.o2{width:520px;height:520px;margin:-260px 0 0 -260px;animation:or 35s linear infinite reverse}
+@keyframes or{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.opip{position:absolute;width:6px;height:6px;background:var(--lime);border-radius:50%;opacity:.5;top:-3px;left:50%;margin-left:-3px}
+.sc-list{display:flex;flex-direction:column;gap:20px}
+.sc-item{display:flex;gap:14px;align-items:flex-start;padding:20px;border-radius:16px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.03);transition:all .4s var(--t)}
+.sc-item:hover{background:rgba(204,255,0,0.04);border-color:rgba(204,255,0,0.1);transform:translateX(6px)}
+.sci{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(204,255,0,0.12),rgba(204,255,0,0.03));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.sct h4{font-size:.9rem;font-weight:700;margin-bottom:3px}
+.sct p{font-size:.78rem;color:var(--gray);line-height:1.55;font-weight:300}
+
+/* Territory */
+.terr-s{background:var(--dark)}
+.terr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.terr-card{border-radius:var(--r);overflow:hidden;background:var(--d3);border:1px solid rgba(255,255,255,0.03);transition:all .5s var(--t)}
+.terr-card:hover{transform:translateY(-8px);border-color:rgba(204,255,0,0.1);box-shadow:0 24px 48px rgba(0,0,0,0.4)}
+.terr-img{height:220px;background-size:cover;background-position:center;position:relative;overflow:hidden;transition:transform .6s var(--t)}
+.terr-card:hover .terr-img{transform:scale(1.05)}
+.terr-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,var(--d3))}
+.terr-body{padding:24px 24px 28px;position:relative;z-index:1;margin-top:-20px}
+.terr-card h4{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.terr-card p{font-size:.8rem;color:var(--gray);line-height:1.6;font-weight:300}
+.terr-tag{display:inline-block;background:var(--ld);color:var(--lime);padding:4px 14px;border-radius:20px;font-size:.68rem;font-weight:600;margin-top:14px}
+
+/* Team */
+.team-s{background:var(--d2)}
+.team-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:20px}
+.tcard{text-align:center;padding:36px 16px;background:var(--d3);border-radius:var(--r);border:1px solid rgba(255,255,255,0.03);transition:all .5s var(--t);overflow:hidden;position:relative}
+.tcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--lime);transform:scaleX(0);transition:transform .5s var(--t)}
+.tcard:hover::before{transform:scaleX(1)}
+.tcard:hover{transform:translateY(-6px);border-color:rgba(204,255,0,0.08);box-shadow:0 16px 40px rgba(0,0,0,0.3)}
+.tav{width:80px;height:80px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:var(--black);transition:transform .4s}
+.tcard:hover .tav{transform:scale(1.08)}
+.tc1{background:linear-gradient(135deg,var(--lime),#88cc00)}.tc2{background:linear-gradient(135deg,#88cc00,#66aa00)}.tc3{background:linear-gradient(135deg,#aadd00,var(--lime))}.tc4{background:linear-gradient(135deg,#66aa00,#88cc00)}.tc5{background:linear-gradient(135deg,var(--lime),#aadd22)}
+.tcard h4{font-size:.92rem;font-weight:700;margin-bottom:2px}
+.tcard .role{font-size:.7rem;color:var(--lime);font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.tcard .bio{font-size:.75rem;color:var(--gray);line-height:1.6;font-weight:300}
+
+/* Testimonials */
+.test-s{background:var(--dark)}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tst{background:var(--d3);border-radius:var(--r);padding:32px;border:1px solid rgba(255,255,255,0.03);transition:all .4s var(--t)}
+.tst:hover{border-color:rgba(204,255,0,0.08);transform:translateY(-4px)}
+.tst-stars{display:flex;gap:2px;margin-bottom:14px}.tst-stars span{color:var(--lime);font-size:.85rem}
+.tst-q{font-size:2.5rem;color:var(--lime);opacity:.2;line-height:1;margin-bottom:10px;font-family:Georgia,serif}
+.tst .txt{font-size:.87rem;color:rgba(255,255,255,0.7);line-height:1.7;font-weight:300;font-style:italic;margin-bottom:20px}
+.tst-a{display:flex;align-items:center;gap:10px}
+.tst-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--lime),#88cc00);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--black)}
+.tst-i .n{font-size:.82rem;font-weight:600}.tst-i .d{font-size:.68rem;color:var(--gray)}
+
+/* Pricing */
+.price-s{background:var(--d2)}
+.price-grid{max-width:820px;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.pcard{background:var(--d3);border-radius:24px;padding:44px 36px;border:1px solid rgba(255,255,255,0.03);transition:all .4s var(--t);position:relative}
+.pcard.pop{border-color:var(--lime);background:linear-gradient(165deg,rgba(204,255,0,0.05),var(--d3) 50%)}
+.pcard.pop::after{content:'Populaire';position:absolute;top:-11px;right:20px;background:var(--lime);color:var(--black);padding:4px 16px;border-radius:20px;font-size:.68rem;font-weight:700}
+.pcard:hover{transform:translateY(-4px)}
+.pn{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:10px}
+.pa{font-size:3rem;font-weight:900;letter-spacing:-.03em;margin-bottom:6px;font-family:'Playfair Display',serif}.pa span{font-size:.95rem;font-weight:400;color:var(--gray);font-family:'Poppins',sans-serif}
+.pd{font-size:.82rem;color:var(--gray);margin-bottom:28px;font-weight:300}
+.pl{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+.pl li{display:flex;align-items:center;gap:10px;font-size:.85rem}
+.pc{color:var(--lime);font-weight:700}
+.pbtn{display:block;width:100%;text-align:center;padding:14px;border-radius:50px;font-weight:600;font-size:.88rem;font-family:'Poppins',sans-serif;transition:all .3s;cursor:pointer;border:none}
+.pbtn.f{background:var(--lime);color:var(--black)}.pbtn.f:hover{box-shadow:0 8px 30px rgba(204,255,0,0.3);transform:translateY(-2px)}
+.pbtn.o{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,0.12)}.pbtn.o:hover{border-color:var(--lime);color:var(--lime)}
+
+/* FAQ */
+.faq-s{background:var(--dark)}
+.faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.faq-item{background:var(--d3);border-radius:16px;border:1px solid rgba(255,255,255,0.03);overflow:hidden;transition:all .3s}
+.faq-item.open{border-color:rgba(204,255,0,0.1)}
+.faq-q{padding:22px 28px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:.95rem;font-weight:600;transition:color .3s;user-select:none}
+.faq-q:hover{color:var(--lime)}
+.faq-arr{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;transition:all .4s var(--t);flex-shrink:0}
+.faq-item.open .faq-arr{background:var(--lime);transform:rotate(180deg)}
+.faq-arr svg{width:14px;height:14px;stroke:var(--white);transition:stroke .3s}.faq-item.open .faq-arr svg{stroke:var(--black)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .5s var(--t),padding .4s;padding:0 28px}
+.faq-item.open .faq-a{max-height:300px;padding:0 28px 24px}
+.faq-a p{font-size:.88rem;color:var(--gl);line-height:1.75;font-weight:300}
+
+/* Newsletter */
+.news-s{background:var(--d2);text-align:center;position:relative;overflow:hidden}
+.news-s::before{content:'';position:absolute;top:50%;left:50%;width:700px;height:700px;background:radial-gradient(circle,rgba(204,255,0,0.06),transparent 65%);transform:translate(-50%,-50%);pointer-events:none}
+.news-c{position:relative;z-index:1;max-width:600px;margin:0 auto}
+.news-form{display:flex;gap:10px;max-width:480px;margin:0 auto}
+.news-in{flex:1;padding:16px 24px;border-radius:50px;border:1px solid rgba(255,255,255,0.08);background:var(--d3);color:var(--white);font-family:'Poppins',sans-serif;font-size:.88rem;outline:none;transition:all .3s}
+.news-in::placeholder{color:var(--gray)}.news-in:focus{border-color:var(--lime);box-shadow:0 0 20px rgba(204,255,0,0.1)}
+.news-btn{padding:16px 32px;border-radius:50px;background:var(--lime);color:var(--black);font-weight:700;font-size:.88rem;font-family:'Poppins',sans-serif;border:none;cursor:pointer;transition:all .3s;white-space:nowrap}
+.news-btn:hover{box-shadow:0 8px 30px rgba(204,255,0,0.35);transform:translateY(-2px)}
+.news-note{font-size:.72rem;color:var(--gray);margin-top:14px;font-weight:300}
+
+/* Partners */
+.part-s{background:var(--dark);text-align:center;padding:80px 32px}
+.part-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.2em;color:var(--gray);margin-bottom:32px}
+.part-logos{display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap;max-width:900px;margin:0 auto}
+.part-logo{font-size:.8rem;font-weight:600;color:rgba(255,255,255,0.18);padding:16px 24px;border:1px solid rgba(255,255,255,0.04);border-radius:12px;transition:all .3s}
+.part-logo:hover{color:rgba(255,255,255,0.5);border-color:rgba(204,255,0,0.1)}
+
+/* CTA */
+.cta-s{background:var(--d2);text-align:center;position:relative;overflow:hidden;padding:140px 32px}
+.cta-s::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(204,255,0,0.2),transparent)}
+.cta-glow{position:absolute;bottom:-200px;left:50%;width:800px;height:500px;background:radial-gradient(ellipse,rgba(204,255,0,0.08),transparent 70%);transform:translateX(-50%);pointer-events:none}
+.cta-c{position:relative;z-index:1;max-width:720px;margin:0 auto}
+.store-badges{display:flex;justify-content:center;gap:14px;margin-top:28px;flex-wrap:wrap}
+.store-badge{display:flex;align-items:center;gap:12px;background:var(--d4);border:1px solid rgba(255,255,255,0.06);padding:14px 28px;border-radius:14px;transition:all .3s}
+.store-badge:hover{border-color:var(--lime);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.3)}
+.store-badge svg{width:26px;height:26px;fill:var(--white)}
+.stxt .sm{font-size:.58rem;color:var(--gray)}.stxt .bg{font-size:.92rem;font-weight:600}
+
+/* ===== SUB-PAGES ===== */
+.subpage{padding:140px 32px 80px}
+.subpage-header{max-width:800px;margin:0 auto 48px;text-align:center}
+.subpage-content{max-width:800px;margin:0 auto}
+.subpage-content h2{font-size:1.6rem;font-weight:700;margin:40px 0 16px;color:var(--white);letter-spacing:-.02em}
+.subpage-content h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--lime)}
+.subpage-content p{font-size:.92rem;color:var(--gl);line-height:1.8;font-weight:300;margin-bottom:16px}
+.subpage-content ul{list-style:none;margin-bottom:20px}
+.subpage-content ul li{font-size:.9rem;color:var(--gl);line-height:1.8;font-weight:300;padding-left:20px;position:relative;margin-bottom:6px}
+.subpage-content ul li::before{content:'→';position:absolute;left:0;color:var(--lime);font-weight:600}
+.subpage-content a{color:var(--lime);transition:opacity .3s}.subpage-content a:hover{opacity:.7}
+.subpage-content .info-box{background:var(--d3);border:1px solid rgba(204,255,0,0.08);border-radius:16px;padding:24px;margin:24px 0}
+.subpage-content .info-box h4{font-size:.95rem;font-weight:700;color:var(--lime);margin-bottom:8px}
+.subpage-content .info-box p{margin-bottom:0}
+.back-btn{display:inline-flex;align-items:center;gap:8px;color:var(--lime);font-size:.85rem;font-weight:600;margin-bottom:32px;cursor:pointer;transition:all .3s}
+.back-btn:hover{transform:translateX(-4px);opacity:.8}
+.back-btn svg{width:16px;height:16px}
+
+/* Contact form */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;max-width:1000px;margin:0 auto}
+.contact-info h3{font-size:1.2rem;font-weight:700;margin-bottom:20px}
+.contact-info p{font-size:.9rem;color:var(--gl);line-height:1.8;font-weight:300;margin-bottom:16px}
+.contact-item{display:flex;gap:14px;align-items:flex-start;margin-bottom:20px}
+.contact-icon{width:44px;height:44px;border-radius:12px;background:var(--ld);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.contact-item p{margin:0}.contact-item .cl{font-size:.8rem;color:var(--gray);font-weight:300}
+.cform{display:flex;flex-direction:column;gap:16px}
+.cform input,.cform textarea,.cform select{padding:16px 20px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:var(--d3);color:var(--white);font-family:'Poppins',sans-serif;font-size:.88rem;outline:none;transition:all .3s;resize:vertical}
+.cform input:focus,.cform textarea:focus,.cform select:focus{border-color:var(--lime);box-shadow:0 0 15px rgba(204,255,0,0.08)}
+.cform select{appearance:none;cursor:pointer}
+.cform textarea{min-height:140px}
+.cform label{font-size:.82rem;font-weight:500;color:var(--gl);margin-bottom:-10px}
+.cform .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* Blog */
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1200px;margin:0 auto}
+.blog-card{background:var(--d3);border-radius:var(--r);overflow:hidden;border:1px solid rgba(255,255,255,0.03);transition:all .5s var(--t)}
+.blog-card:hover{transform:translateY(-6px);border-color:rgba(204,255,0,0.1);box-shadow:0 20px 40px rgba(0,0,0,0.3)}
+.blog-img{height:180px;background-size:cover;background-position:center;position:relative}
+.blog-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,var(--d3))}
+.blog-body{padding:24px}
+.blog-tag{display:inline-block;background:var(--ld);color:var(--lime);padding:3px 12px;border-radius:20px;font-size:.65rem;font-weight:600;margin-bottom:12px}
+.blog-card h3{font-size:1rem;font-weight:700;margin-bottom:8px;line-height:1.35}
+.blog-card p{font-size:.8rem;color:var(--gray);line-height:1.6;font-weight:300;margin-bottom:14px}
+.blog-meta{font-size:.7rem;color:rgba(255,255,255,0.25)}
+
+/* Parcours */
+.parcours-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:1000px;margin:0 auto}
+.parcours-card{background:var(--d3);border-radius:var(--r);padding:28px;border:1px solid rgba(255,255,255,0.03);transition:all .4s var(--t);display:flex;gap:20px}
+.parcours-card:hover{border-color:rgba(204,255,0,0.1);transform:translateY(-4px)}
+.parcours-thumb{width:80px;height:80px;border-radius:14px;background:linear-gradient(135deg,rgba(204,255,0,0.1),rgba(204,255,0,0.03));display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0}
+.parcours-info h4{font-size:.95rem;font-weight:700;margin-bottom:4px}
+.parcours-info p{font-size:.78rem;color:var(--gray);line-height:1.5;font-weight:300;margin-bottom:8px}
+.parcours-stats{display:flex;gap:16px}
+.parcours-stat{font-size:.68rem;color:var(--lime);font-weight:600;display:flex;align-items:center;gap:4px}
+
+/* Roadmap */
+.roadmap-timeline{max-width:700px;margin:0 auto;position:relative;padding-left:40px}
+.roadmap-timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:rgba(204,255,0,0.1)}
+.rm-item{position:relative;margin-bottom:40px}
+.rm-dot{position:absolute;left:-34px;top:4px;width:16px;height:16px;border-radius:50%;background:var(--d3);border:2px solid var(--lime);z-index:1}
+.rm-item.done .rm-dot{background:var(--lime)}
+.rm-item h4{font-size:1rem;font-weight:700;margin-bottom:4px}
+.rm-item .rm-date{font-size:.72rem;color:var(--lime);font-weight:600;margin-bottom:8px}
+.rm-item p{font-size:.85rem;color:var(--gray);line-height:1.65;font-weight:300}
+
+/* Footer */
+footer{background:var(--black);padding:56px 32px 28px;border-top:1px solid rgba(255,255,255,0.03)}
+.footer-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand p{font-size:.8rem;color:var(--gray);line-height:1.65;font-weight:300;max-width:280px;margin-top:14px}
+.footer-soc{display:flex;gap:10px;margin-top:18px}
+.footer-so{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:var(--gray);transition:all .3s;cursor:pointer}
+.footer-so:hover{background:var(--lime);color:var(--black)}
+.footer-col h5{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px}
+.footer-col a{display:block;font-size:.82rem;color:var(--gray);margin-bottom:10px;transition:color .3s;font-weight:300;cursor:pointer}
+.footer-col a:hover{color:var(--lime)}
+.footer-bot{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid rgba(255,255,255,0.03)}
+.footer-bot p{font-size:.72rem;color:rgba(255,255,255,0.2);font-weight:300}
+.flinks{display:flex;gap:20px}
+.flinks a{font-size:.72rem;color:rgba(255,255,255,0.2);transition:color .3s;cursor:pointer}.flinks a:hover{color:var(--lime)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+.fgrid{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:repeat(2,1fr);gap:32px}.sline{display:none}
+.show-grid{grid-template-columns:1fr;text-align:center}.show-vis{order:-1;min-height:450px}
+.team-grid{grid-template-columns:repeat(3,1fr)}.footer-grid{grid-template-columns:1fr 1fr}
+.contact-grid{grid-template-columns:1fr}.blog-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+section{padding:80px 20px}nav{padding:14px 20px}.nav-links{display:none}.hamburger{display:flex}
+.hero{padding:120px 20px 60px}.hero h1{font-size:clamp(2.2rem,8vw,3.2rem)}.hero-stats{flex-direction:column;gap:16px;align-items:center}
+.fgrid{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.terr-grid{grid-template-columns:1fr;max-width:400px;margin:0 auto}
+.team-grid{grid-template-columns:repeat(2,1fr)}.test-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}
+.price-grid{grid-template-columns:1fr;max-width:400px;margin:0 auto}
+.news-form{flex-direction:column}.store-badges{flex-direction:column;align-items:center}
+.footer-grid{grid-template-columns:1fr;gap:28px}.footer-bot{flex-direction:column;gap:12px;text-align:center}
+.show-s{padding:80px 20px}.part-logos{gap:20px}.cursor-glow{display:none}
+.blog-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}
+.parcours-grid{grid-template-columns:1fr}.cform .row{grid-template-columns:1fr}
+.subpage{padding:120px 20px 60px}
+}
+@media(max-width:480px){.steps{grid-template-columns:1fr}.team-grid{grid-template-columns:1fr;max-width:300px;margin:0 auto}}
+</style>
+</head>
+<body>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a class="nav-logo" data-nav="home"><div class="logo-icon"><img src="https://i.postimg.cc/28hLgdtg/Black-White-Minimal-Simple-Bold-Modern-Professional-Photography-Letter-K-Museum-Logo-(1).png" alt="Isard logo"></div>isard</a>
+  <ul class="nav-links">
+    <li><a data-nav="home" data-scroll="features">Fonctionnalités</a></li>
+    <li><a data-nav="parcours">Parcours</a></li>
+    <li><a data-nav="home" data-scroll="team">Équipe</a></li>
+    <li><a data-nav="home" data-scroll="pricing">Tarifs</a></li>
+    <li><a data-nav="faq">FAQ</a></li>
+    <li class="ncta"><a data-nav="home" data-scroll="download"><span>Télécharger</span></a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a data-nav="home" class="mm">Accueil</a>
+  <a data-nav="home" data-scroll="features" class="mm">Fonctionnalités</a>
+  <a data-nav="parcours" class="mm">Parcours</a>
+  <a data-nav="home" data-scroll="team" class="mm">Équipe</a>
+  <a data-nav="home" data-scroll="pricing" class="mm">Tarifs</a>
+  <a data-nav="faq" class="mm">FAQ</a>
+  <a data-nav="home" data-scroll="download" class="mm mcta">Télécharger</a>
+</div>
+
+<!-- ==================== HOME PAGE ==================== -->
+<div class="page active" id="page-home">
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-orb"></div>
+  <div class="hero-mountains" id="heroMountains">
+    <svg class="mountain-layer" id="mtn3" viewBox="0 0 1440 400" preserveAspectRatio="none" style="height:55%;opacity:.3"><path d="M0,400 L0,320 L100,280 L200,310 L350,200 L500,260 L650,140 L800,210 L950,100 L1100,170 L1250,90 L1350,150 L1440,120 L1440,400Z" fill="rgba(204,255,0,0.04)"/></svg>
+    <svg class="mountain-layer" id="mtn2" viewBox="0 0 1440 400" preserveAspectRatio="none" style="height:45%;opacity:.5"><path d="M0,400 L0,340 L180,280 L320,320 L500,230 L680,290 L850,180 L1000,240 L1150,160 L1300,210 L1440,180 L1440,400Z" fill="rgba(204,255,0,0.025)"/></svg>
+    <svg class="mountain-layer" id="mtn1" viewBox="0 0 1440 400" preserveAspectRatio="none" style="height:35%;opacity:.8"><path d="M0,400 L0,360 L240,320 L400,350 L600,290 L800,330 L1000,280 L1200,310 L1440,270 L1440,400Z" fill="rgba(204,255,0,0.015)"/></svg>
+  </div>
+  <div class="particles" id="particles"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="bdot"></span>Bientôt disponible sur iOS & Android</div>
+    <h1><span class="hl"><span class="hli">La nature prend une</span></span><span class="hl"><span class="hli">autre <span class="hi">dimension.</span></span></span></h1>
+    <p class="hero-sub">Isard transforme chaque randonnée en expérience immersive grâce à la réalité augmentée. Faune, flore, patrimoine, l'Occitanie prend vie sous vos yeux.</p>
+    <div class="hero-actions">
+      <a class="btn-p" data-nav="home" data-scroll="download">Découvrir l'app <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a class="btn-g" data-nav="home" data-scroll="features">Comment ça marche</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" data-target="200" data-suffix="+">0</div><div class="label">Sentiers cartographiés</div></div>
+      <div class="hero-stat"><div class="num" data-target="500" data-suffix="+">0</div><div class="label">Espèces identifiables</div></div>
+      <div class="hero-stat"><div class="num" data-target="100" data-suffix="%">0</div><div class="label">Hors-ligne capable</div></div>
+    </div>
+  </div>
+  <div class="scroll-ind"><span>scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<!-- MARQUEE -->
+<section class="marquee-s" style="padding:0">
+  <div class="mtrack">
+    <div class="mitem">Réalité augmentée <span class="mdot"></span> Géolocalisation <span class="mdot"></span> Faune & Flore <span class="mdot"></span> Patrimoine <span class="mdot"></span> Gamification <span class="mdot"></span> Occitanie <span class="mdot"></span> Hors-ligne <span class="mdot"></span></div>
+    <div class="mitem">Réalité augmentée <span class="mdot"></span> Géolocalisation <span class="mdot"></span> Faune & Flore <span class="mdot"></span> Patrimoine <span class="mdot"></span> Gamification <span class="mdot"></span> Occitanie <span class="mdot"></span> Hors-ligne <span class="mdot"></span></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="feat-s" id="features">
+  <div class="container" style="margin-bottom:72px"><div class="slabel r">Fonctionnalités</div><h2 class="stitle r d1">La technologie au service<br>de la <span class="a">nature</span></h2><p class="sdesc r d2">Six innovations qui transforment votre façon de randonner. Plus qu'une app, un véritable compagnon de montagne.</p></div>
+  <div class="fgrid container">
+    <div class="fcard r"><span class="fnum">01</span><div class="ficon">📷</div><h3>Réalité augmentée</h3><p>Pointez votre caméra pour identifier instantanément plantes, animaux et reliefs. La montagne prend vie sous vos yeux.</p></div>
+    <div class="fcard r d1"><span class="fnum">02</span><div class="ficon">🗺️</div><h3>Navigation intelligente</h3><p>Itinéraires précis avec données IGN. Notifications contextuelles selon votre altitude et les points d'intérêt proches.</p></div>
+    <div class="fcard r d2"><span class="fnum">03</span><div class="ficon">🌿</div><h3>Encyclopédie vivante</h3><p>Base de données enrichie par nos partenaires locaux. Faune, flore, patrimoine : chaque sentier raconte une histoire.</p></div>
+    <div class="fcard r d3"><span class="fnum">04</span><div class="ficon">🏆</div><h3>Challenges & badges</h3><p>Collectionnez des récompenses, relevez des défis saisonniers et grimpez dans le classement des explorateurs.</p></div>
+    <div class="fcard r d4"><span class="fnum">05</span><div class="ficon">📍</div><h3>Points d'intérêt cachés</h3><p>Grottes secrètes, panoramas, sources d'eau, sites historiques. Ce que les autres apps ne montrent pas.</p></div>
+    <div class="fcard r d5"><span class="fnum">06</span><div class="ficon">📱</div><h3>Mode hors-ligne</h3><p>Téléchargez vos parcours avant de partir. Pas de réseau ? L'aventure continue sans interruption.</p></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-s">
+  <div class="container" style="margin-bottom:72px"><div class="slabel r">Comment ça marche</div><h2 class="stitle r d1">Prêt en <span class="a">4 étapes</span></h2><p class="sdesc r d2">De l'installation à votre première découverte en réalité augmentée — tout est simple et rapide.</p></div>
+  <div class="steps-c container">
+    <div class="sline"><div class="sline-f" id="stepsLineFill"></div></div>
+    <div class="steps">
+      <div class="step r"><div class="step-c">🔽</div><h4>Téléchargez</h4><p>Gratuit sur App Store & Google Play. Profil créé en 30 secondes.</p></div>
+      <div class="step r d1"><div class="step-c">🔍</div><h4>Choisissez</h4><p>Filtrez par niveau, durée et thématique. Le parcours qui vous ressemble.</p></div>
+      <div class="step r d2"><div class="step-c">🥾</div><h4>Explorez</h4><p>Guidage en temps réel avec notifications aux points d'intérêt.</p></div>
+      <div class="step r d3"><div class="step-c">✨</div><h4>Découvrez</h4><p>RA pour identifier espèces et patrimoine. Collectez vos badges.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- APP SHOWCASE -->
+<section class="show-s" id="app">
+  <div class="show-grid container">
+    <div class="show-vis rs">
+      <div class="orbit o1"><div class="opip"></div></div><div class="orbit o2"><div class="opip"></div></div>
+      <div class="phone-w" id="phoneParallax">
+        <div class="phone"><div class="phone-notch"></div><div class="phone-scr"><div class="phone-cnt">
+          <div class="phone-top"><div class="phone-brand">isard</div><div class="phone-loc">📍 Pic du Midi</div></div>
+          <div class="phone-map"><div class="phone-map-g"></div>
+            <div class="trail-svg"><svg viewBox="0 0 200 160"><path class="trail-sh" d="M10,140 Q30,120 55,95 Q80,70 105,78 Q130,86 155,48 Q175,28 190,15"/><path class="trail-m" d="M10,140 Q30,120 55,95 Q80,70 105,78 Q130,86 155,48 Q175,28 190,15"/></svg></div>
+            <div class="mpin p1"></div><div class="mpin p2"></div><div class="mpin p3"></div>
+            <div class="arl l1"><div class="ardot"></div>Isard pyrénéen</div><div class="arl l2"><div class="ardot"></div>Gentiane jaune</div>
+          </div>
+          <div class="phone-tabs"><div class="ptab"></div><div class="ptab act"></div><div class="ptab"></div><div class="ptab"></div></div>
+        </div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel r">L'expérience Isard</div><h2 class="stitle r d1">Votre guide de<br>montagne <span class="a">augmenté</span></h2><p class="sdesc r d2" style="margin-bottom:36px">Plus qu'une app de navigation. Isard enrichit chaque pas avec de l'information contextuelle et des découvertes uniques.</p>
+      <div class="sc-list">
+        <div class="sc-item r d3"><div class="sci">🎯</div><div class="sct"><h4>Notifications contextuelles</h4><p>Alertes intelligentes basées sur votre altitude et les points d'intérêt proches.</p></div></div>
+        <div class="sc-item r d4"><div class="sci">🦅</div><div class="sct"><h4>Identification RA</h4><p>Reconnaissance instantanée de la faune, flore et patrimoine architectural.</p></div></div>
+        <div class="sc-item r d5"><div class="sci">📊</div><div class="sct"><h4>Données co-créées</h4><p>Contenus enrichis par les parcs naturels, offices de tourisme et experts locaux.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TERRITORY -->
+<section class="terr-s" id="territory">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:56px"><div class="slabel ctr r">Nos territoires</div><h2 class="stitle r d1" style="text-align:center">L'Occitanie comme terrain de <span class="a">jeu</span></h2><p class="sdesc r d2" style="margin:0 auto">Des Pyrénées aux causses du Quercy, explorez les plus beaux sentiers du sud de la France.</p></div>
+    <div class="terr-grid">
+      <div class="terr-card r"><div class="terr-img" style="background-image:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80')"></div><div class="terr-body"><h4>Pyrénées centrales</h4><p>Sommets majestueux, lacs d'altitude et isards sauvages. Le cœur de l'aventure.</p><span class="terr-tag">45 parcours</span></div></div>
+      <div class="terr-card r d1"><div class="terr-img" style="background-image:url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80')"></div><div class="terr-body"><h4>Ariège & Couserans</h4><p>Forêts profondes, grottes préhistoriques et villages perchés.</p><span class="terr-tag">32 parcours</span></div></div>
+      <div class="terr-card r d2"><div class="terr-img" style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80')"></div><div class="terr-body"><h4>Causses & vallées</h4><p>Paysages karstiques, dolmens millénaires et flore méditerranéenne.</p><span class="terr-tag">28 parcours</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team-s" id="team">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:64px"><div class="slabel ctr r">L'équipe</div><h2 class="stitle r d1" style="text-align:center">5 passionnés, une <span class="a">mission</span></h2><p class="sdesc r d2" style="margin:0 auto">Des profils complémentaires unis par l'amour de la nature et de l'innovation.</p></div>
+    <div class="team-grid">
+      <div class="tcard r"><div class="tav tc1">LL</div><h4>Laura Lopez</h4><div class="role">CEO</div><p class="bio">Randonneuse aguerrie, ancienne militaire. Organisation et rigueur au service du projet.</p></div>
+      <div class="tcard r d1"><div class="tav tc2">KA</div><h4>Khaled Aboubakar</h4><div class="role">CTO</div><p class="bio">Créatif et innovant. Marketing digital, UX/UI et réflexion produit.</p></div>
+      <div class="tcard r d2"><div class="tav tc3">GT</div><h4>Gabriela Toro</h4><div class="role">Partenariats</div><p class="bio">Ex-Jooks. Experte parcours touristiques et relations partenaires.</p></div>
+      <div class="tcard r d3"><div class="tav tc4">ÉG</div><h4>Émilie Goba</h4><div class="role">Product Manager</div><p class="bio">Psychologue de formation. Roadmap et analyse utilisateurs.</p></div>
+      <div class="tcard r d4"><div class="tav tc5">DD</div><h4>Dominique Djamala</h4><div class="role">Marketing</div><p class="bio">Stratégie marketing et community management. L'énergie d'Isard.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="test-s">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:56px"><div class="slabel ctr r">Témoignages</div><h2 class="stitle r d1" style="text-align:center">Ce qu'en disent nos <span class="a">explorateurs</span></h2></div>
+    <div class="test-grid">
+      <div class="tst r"><div class="tst-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div><div class="tst-q">"</div><p class="txt">J'ai découvert des espèces de fleurs que je croisais depuis des années sans les connaître. La RA change tout.</p><div class="tst-a"><div class="tst-av">ML</div><div class="tst-i"><div class="n">Marie L.</div><div class="d">Randonneuse, Toulouse</div></div></div></div>
+      <div class="tst r d1"><div class="tst-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div><div class="tst-q">"</div><p class="txt">Mes enfants adorent les badges. Première rando où ils ne demandent pas « quand est-ce qu'on rentre ? »</p><div class="tst-a"><div class="tst-av">PT</div><div class="tst-i"><div class="n">Pierre T.</div><div class="d">Papa randonneur, Ariège</div></div></div></div>
+      <div class="tst r d2"><div class="tst-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div><div class="tst-q">"</div><p class="txt">En tant que guide, je recommande Isard. Les contenus patrimoniaux sont d'une richesse remarquable.</p><div class="tst-a"><div class="tst-av">SC</div><div class="tst-i"><div class="n">Sophie C.</div><div class="d">Guide de montagne</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="price-s" id="pricing">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:56px"><div class="slabel ctr r">Tarifs</div><h2 class="stitle r d1" style="text-align:center">Commencez gratuitement.<br>Évoluez à votre <span class="a">rythme</span></h2><p class="sdesc r d2" style="margin:0 auto">Le freemium donne accès à l'essentiel. Le Premium débloque tout le potentiel.</p></div>
+    <div class="price-grid" style="grid-template-columns:repeat(3,1fr);max-width:1080px">
+      <div class="pcard r"><div class="pn">Freemium</div><div class="pa">0€</div><div class="pd">Découvrez Isard et ses fonctions essentielles.</div><ul class="pl"><li><span class="pc">✓</span>3 parcours par mois</li><li><span class="pc">✓</span>Navigation GPS de base</li><li><span class="pc">✓</span>Identification RA limitée</li><li><span class="pc">✓</span>Badges de découverte</li><li><span class="pc">✓</span>Points d'intérêt principaux</li></ul><button class="pbtn o">Commencer gratuitement</button></div>
+      <div class="pcard r d1"><div class="pn">Mensuel</div><div class="pa">6,99€ <span>/ mois</span></div><div class="pd">Accès complet, sans engagement. Résiliable à tout moment.</div><ul class="pl"><li><span class="pc">✓</span>Parcours illimités</li><li><span class="pc">✓</span>RA complète faune, flore, patrimoine</li><li><span class="pc">✓</span>Mode hors-ligne intégral</li><li><span class="pc">✓</span>Parcours personnalisés</li><li><span class="pc">✓</span>Pack famille & experts</li><li><span class="pc">✓</span>Altimétrie avancée & météo</li></ul><button class="pbtn o">Choisir mensuel</button></div>
+      <div class="pcard pop r d2"><div class="pn">Annuel</div><div class="pa">59,99€ <span>/ an</span></div><div class="pd">Le meilleur rapport qualité-prix. Économisez 29% par rapport au mensuel.</div><ul class="pl"><li><span class="pc">✓</span>Tout le mensuel inclus</li><li><span class="pc">✓</span>RA complète faune, flore, patrimoine</li><li><span class="pc">✓</span>Mode hors-ligne intégral</li><li><span class="pc">✓</span>Parcours personnalisés</li><li><span class="pc">✓</span>Pack famille & experts</li><li><span class="pc">✓</span>Accès prioritaire aux nouveautés</li></ul><button class="pbtn f">Choisir annuel — Économisez 29%</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="news-s">
+  <div class="news-c"><div class="slabel ctr r">Restez informé</div><h2 class="stitle r d1" style="text-align:center">Soyez les <span class="a">premiers</span><br>à explorer</h2><p class="sdesc r d2" style="margin:0 auto 36px">Inscrivez-vous pour être notifié du lancement et recevoir un accès anticipé à la bêta.</p>
+    <form class="news-form r d3" onsubmit="event.preventDefault();handleNews(this)"><input type="email" class="news-in" placeholder="votre@email.com" required><button type="submit" class="news-btn">S'inscrire</button></form>
+    <p class="news-note r d4">Pas de spam. Désabonnement en un clic.</p>
+  </div>
+</section>
+
+<!-- PARTNERS -->
+<section class="part-s">
+  <div class="part-label r">Ils nous font confiance</div>
+  <div class="part-logos"><div class="part-logo r">🏔️ Parc National des Pyrénées</div><div class="part-logo r d1">🗺️ IGN</div><div class="part-logo r d2">🏛️ Office de Tourisme Occitanie</div><div class="part-logo r d3">🌿 Géoparc des Causses</div><div class="part-logo r d4">⛰️ Stations Vertes</div></div>
+</section>
+
+<!-- CTA -->
+<section class="cta-s" id="download">
+  <div class="cta-glow"></div>
+  <div class="cta-c">
+    <div class="slabel ctr r">Prêt à explorer ?</div><h2 class="stitle r d1" style="text-align:center">Votre prochaine randonnée<br>sera <span class="a">inoubliable</span></h2><p class="sdesc r d2" style="margin:0 auto 40px">Rejoignez les explorateurs qui redécouvrent l'Occitanie. Téléchargez gratuitement.</p>
+    <div style="display:flex;justify-content:center" class="r d3"><a class="btn-p" style="font-size:1.05rem;padding:18px 44px">Télécharger Isard <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a></div>
+    <div class="store-badges r d4">
+      <a class="store-badge"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><div class="stxt"><div class="sm">Télécharger sur l'</div><div class="bg">App Store</div></div></a>
+      <a class="store-badge"><svg viewBox="0 0 24 24"><path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.61 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/></svg><div class="stxt"><div class="sm">Disponible sur</div><div class="bg">Google Play</div></div></a>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== PARCOURS PAGE ==================== -->
+<div class="page" id="page-parcours">
+<section class="subpage">
+  <div class="container">
+    <div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">Parcours</div><h2 class="stitle" style="text-align:center">Nos <span class="a">itinéraires</span></h2><p class="sdesc" style="margin:0 auto">Découvrez notre sélection de parcours enrichis en réalité augmentée à travers l'Occitanie.</p></div>
+    <div class="parcours-grid">
+      <div class="parcours-card r"><div class="parcours-thumb">🏔️</div><div class="parcours-info"><h4>Lac de Gaube — Pont d'Espagne</h4><p>Randonnée emblématique jusqu'au lac glaciaire au pied du Vignemale. Faune alpine exceptionnelle.</p><div class="parcours-stats"><span class="parcours-stat">⏱ 3h30</span><span class="parcours-stat">📏 9,2 km</span><span class="parcours-stat">📈 520m D+</span><span class="parcours-stat">🟡 Moyen</span></div></div></div>
+      <div class="parcours-card r d1"><div class="parcours-thumb">🌲</div><div class="parcours-info"><h4>Sentier des Tourbières — Ariège</h4><p>Boucle à travers les tourbières de l'Ariège avec identification botanique RA unique.</p><div class="parcours-stats"><span class="parcours-stat">⏱ 2h00</span><span class="parcours-stat">📏 5,8 km</span><span class="parcours-stat">📈 180m D+</span><span class="parcours-stat">🟢 Facile</span></div></div></div>
+      <div class="parcours-card r d2"><div class="parcours-thumb">🏛️</div><div class="parcours-info"><h4>Circuit des Dolmens — Quercy</h4><p>Parcours patrimonial unique parmi les dolmens millénaires et la flore des causses calcaires.</p><div class="parcours-stats"><span class="parcours-stat">⏱ 2h45</span><span class="parcours-stat">📏 7,1 km</span><span class="parcours-stat">📈 250m D+</span><span class="parcours-stat">🟢 Facile</span></div></div></div>
+      <div class="parcours-card r d3"><div class="parcours-thumb">🦅</div><div class="parcours-info"><h4>Crête du Pic du Midi d'Ossau</h4><p>Randonnée alpine avec observation de vautours fauves et panorama exceptionnel sur les Pyrénées.</p><div class="parcours-stats"><span class="parcours-stat">⏱ 6h00</span><span class="parcours-stat">📏 14 km</span><span class="parcours-stat">📈 980m D+</span><span class="parcours-stat">🔴 Difficile</span></div></div></div>
+      <div class="parcours-card r d4"><div class="parcours-thumb">🌸</div><div class="parcours-info"><h4>Vallée du Lys — Bagnères</h4><p>Balade familiale au cœur d'une vallée fleurie. Cascades et identification de plus de 40 espèces.</p><div class="parcours-stats"><span class="parcours-stat">⏱ 1h30</span><span class="parcours-stat">📏 4,2 km</span><span class="parcours-stat">📈 120m D+</span><span class="parcours-stat">🟢 Facile</span></div></div></div>
+      <div class="parcours-card r d5"><div class="parcours-thumb">🏞️</div><div class="parcours-info"><h4>Gorges de la Frau — Montségur</h4><p>Sentier sauvage entre falaises vertigineuses et forêt dense. Points d'intérêt cathares.</p><div class="parcours-stats"><span class="parcours-stat">⏱ 4h15</span><span class="parcours-stat">📏 11 km</span><span class="parcours-stat">📈 680m D+</span><span class="parcours-stat">🟡 Moyen</span></div></div></div>
+      <div class="parcours-card r d6"><div class="parcours-thumb">🌊</div><div class="parcours-info"><h4>Lac d'Oô — Vallée du Luchon</h4><p>Joyau des Pyrénées centrales avec sa cascade spectaculaire de 275m. Observation d'isards.</p><div class="parcours-stats"><span class="parcours-stat">⏱ 3h00</span><span class="parcours-stat">📏 7,8 km</span><span class="parcours-stat">📈 540m D+</span><span class="parcours-stat">🟡 Moyen</span></div></div></div>
+      <div class="parcours-card r d7"><div class="parcours-thumb">🌄</div><div class="parcours-info"><h4>Tour du Pic de Cagire</h4><p>Panorama 360° sur les Pyrénées et la plaine de la Garonne. Flore montagnarde diversifiée.</p><div class="parcours-stats"><span class="parcours-stat">⏱ 5h00</span><span class="parcours-stat">📏 12 km</span><span class="parcours-stat">📈 850m D+</span><span class="parcours-stat">🔴 Difficile</span></div></div></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== FAQ PAGE ==================== -->
+<div class="page" id="page-faq">
+<section class="subpage">
+  <div class="container">
+    <div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">FAQ</div><h2 class="stitle" style="text-align:center">Questions <span class="a">fréquentes</span></h2><p class="sdesc" style="margin:0 auto">Tout ce que vous devez savoir avant de chausser vos chaussures de randonnée.</p></div>
+    <div class="faq-list">
+      <div class="faq-item r" data-faq><div class="faq-q">L'application fonctionne-t-elle sans connexion internet ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>Absolument ! Le mode hors-ligne vous permet de télécharger vos parcours avant de partir. Cartes, points d'intérêt et contenus pédagogiques restent accessibles même sans réseau. Indispensable en montagne où la couverture est souvent limitée.</p></div></div>
+      <div class="faq-item r d1" data-faq><div class="faq-q">Comment fonctionne la réalité augmentée ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>Pointez simplement votre caméra vers une plante, un animal ou un bâtiment. L'IA d'Isard reconnaît l'élément et affiche instantanément des informations enrichies : nom scientifique et commun, description détaillée, anecdotes historiques et conseils d'observation. La base de données est enrichie en continu par nos partenaires naturalistes.</p></div></div>
+      <div class="faq-item r d2" data-faq><div class="faq-q">Quelles régions sont couvertes au lancement ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>Le lancement se concentre sur l'Occitanie : Pyrénées centrales, Ariège, Couserans et les causses du Quercy. L'extension à d'autres départements d'Occitanie est prévue dès la phase de consolidation, puis un déploiement national en année 2, avec traduction en anglais et espagnol.</p></div></div>
+      <div class="faq-item r d3" data-faq><div class="faq-q">La version gratuite est-elle vraiment suffisante ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>La version gratuite donne accès à 3 parcours par mois avec la navigation GPS de base et une identification RA limitée. C'est idéal pour découvrir Isard et décider si vous souhaitez passer au Premium pour un accès illimité, le mode hors-ligne complet et les packs famille/experts.</p></div></div>
+      <div class="faq-item r d4" data-faq><div class="faq-q">Qui crée les contenus sur la faune et la flore ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>Nos contenus sont co-créés avec des experts naturalistes, des parcs naturels régionaux (Parc National des Pyrénées, Géoparc des Causses), des offices de tourisme et des guides locaux certifiés. Chaque information est vérifiée, sourcée et enrichie en continu grâce à une base de données évolutive.</p></div></div>
+      <div class="faq-item r d5" data-faq><div class="faq-q">Isard convient-il aux familles avec enfants ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>C'est l'un de nos points forts ! Le Pack Famille (Premium) inclut des contenus pédagogiques adaptés aux enfants, des quiz interactifs, des badges ludiques et des parcours spécialement pensés pour les familles avec des distances et dénivelés adaptés.</p></div></div>
+      <div class="faq-item r d6" data-faq><div class="faq-q">Comment puis-je annuler mon abonnement Premium ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>Vous pouvez annuler votre abonnement à tout moment depuis les paramètres de votre compte dans l'application, ou directement via votre compte App Store / Google Play. L'annulation prend effet à la fin de la période de facturation en cours. Aucun frais caché, aucun engagement.</p></div></div>
+      <div class="faq-item r d7" data-faq><div class="faq-q">L'application est-elle disponible sur tablette ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>Isard est optimisé pour smartphone (iOS et Android). Une version tablette est prévue dans notre roadmap 2027. En attendant, l'application fonctionne sur tablette avec une mise à l'échelle automatique.</p></div></div>
+      <div class="faq-item r" data-faq><div class="faq-q">Puis-je proposer un nouveau sentier ou signaler une erreur ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>Bien sûr ! Isard est une application communautaire. Vous pouvez proposer de nouveaux itinéraires, signaler des erreurs ou des modifications de sentiers directement depuis l'application. Notre équipe vérifie chaque contribution avant publication.</p></div></div>
+      <div class="faq-item r d1" data-faq><div class="faq-q">Comment fonctionne le système de badges et challenges ?<div class="faq-arr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></div></div><div class="faq-a"><p>Chaque randonnée vous rapporte des points d'expérience. Complétez des objectifs spécifiques (identifier 10 espèces, parcourir 50 km, explorer 5 sites patrimoniaux) pour débloquer des badges exclusifs. Des challenges saisonniers sont lancés régulièrement avec des récompenses partenaires.</p></div></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== BLOG PAGE ==================== -->
+<div class="page" id="page-blog">
+<section class="subpage">
+  <div class="container">
+    <div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">Blog</div><h2 class="stitle" style="text-align:center">Nos <span class="a">articles</span></h2><p class="sdesc" style="margin:0 auto">Guides, conseils et découvertes pour enrichir vos randonnées en Occitanie.</p></div>
+    <div class="blog-grid">
+      <div class="blog-card r"><div class="blog-img" style="background:linear-gradient(135deg,#1a3a0a,#0a1a04);display:flex;align-items:center;justify-content:center"><span style="font-size:3rem;opacity:.5;position:relative;z-index:1">🏔️</span></div><div class="blog-body"><span class="blog-tag">Guide</span><h3>Les plus beaux points de vue d'automne en Occitanie</h3><p>Notre sélection des 10 panoramas incontournables à découvrir avant l'hiver, des Pyrénées aux causses.</p><div class="blog-meta">15 octobre 2026 — 8 min de lecture</div></div></div>
+      <div class="blog-card r d1"><div class="blog-img" style="background:linear-gradient(135deg,#2a2a0a,#1a1a04);display:flex;align-items:center;justify-content:center"><span style="font-size:3rem;opacity:.5;position:relative;z-index:1">📷</span></div><div class="blog-body"><span class="blog-tag">Technologie</span><h3>Comment la réalité augmentée révolutionne la randonnée</h3><p>Découvrez comment Isard utilise l'IA et la RA pour identifier faune et flore en temps réel sur le terrain.</p><div class="blog-meta">2 octobre 2026 — 6 min de lecture</div></div></div>
+      <div class="blog-card r d2"><div class="blog-img" style="background:linear-gradient(135deg,#0a2a1a,#041a0a);display:flex;align-items:center;justify-content:center"><span style="font-size:3rem;opacity:.5;position:relative;z-index:1">🌿</span></div><div class="blog-body"><span class="blog-tag">Nature</span><h3>Identifier les champignons des Pyrénées : guide du débutant</h3><p>Cèpes, girolles, trompettes : apprenez à reconnaître les espèces comestibles et celles à éviter absolument.</p><div class="blog-meta">18 septembre 2026 — 10 min de lecture</div></div></div>
+      <div class="blog-card r d3"><div class="blog-img" style="background:linear-gradient(135deg,#1a1a2a,#0a0a1a);display:flex;align-items:center;justify-content:center"><span style="font-size:3rem;opacity:.5;position:relative;z-index:1">👨‍👩‍👧‍👦</span></div><div class="blog-body"><span class="blog-tag">Famille</span><h3>Randonner avec des enfants : nos 7 conseils pour réussir</h3><p>Distances, équipement, motivation : tout ce qu'il faut savoir pour des sorties réussies en famille.</p><div class="blog-meta">5 septembre 2026 — 7 min de lecture</div></div></div>
+      <div class="blog-card r d4"><div class="blog-img" style="background:linear-gradient(135deg,#2a1a0a,#1a0a04);display:flex;align-items:center;justify-content:center"><span style="font-size:3rem;opacity:.5;position:relative;z-index:1">🗺️</span></div><div class="blog-body"><span class="blog-tag">Territoire</span><h3>L'Ariège secrète : 5 sentiers méconnus à explorer</h3><p>Loin du tourisme de masse, ces sentiers cachés révèlent des trésors patrimoniaux et naturels uniques.</p><div class="blog-meta">20 août 2026 — 9 min de lecture</div></div></div>
+      <div class="blog-card r d5"><div class="blog-img" style="background:linear-gradient(135deg,#0a1a2a,#040a1a);display:flex;align-items:center;justify-content:center"><span style="font-size:3rem;opacity:.5;position:relative;z-index:1">❄️</span></div><div class="blog-body"><span class="blog-tag">Guide</span><h3>Préparer la transition vers la randonnée hivernale</h3><p>Équipement, sécurité, itinéraires adaptés : préparez vos sorties d'hiver en toute sérénité.</p><div class="blog-meta">1 novembre 2026 — 8 min de lecture</div></div></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== ABOUT PAGE ==================== -->
+<div class="page" id="page-about">
+<section class="subpage">
+  <div class="container"><div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">À propos</div><h2 class="stitle" style="text-align:center">L'histoire <span class="a">d'Isard</span></h2></div>
+    <div class="subpage-content">
+      <h2>Notre mission</h2>
+      <p>Isard est née d'un constat simple : la randonnée est l'une des activités de plein air les plus populaires en France, mais les outils numériques existants se limitent à la navigation GPS. Nous croyons que la technologie peut enrichir l'expérience outdoor sans la dénaturer.</p>
+      <p>Notre mission est de transformer chaque sortie en montagne en une expérience immersive, éducative et mémorable, tout en valorisant les territoires et en soutenant un tourisme local et responsable.</p>
+
+      <h2>Pourquoi « Isard » ?</h2>
+      <p>L'isard est un animal emblématique des montagnes pyrénéennes. Agile, endurant et parfaitement adapté aux terrains les plus exigeants, il avance avec assurance là où le chemin devient plus sauvage. C'est cet esprit que nous voulons incarner : une application pensée pour les randonneurs qui aiment explorer, sortir des sentiers battus et évoluer en harmonie avec la nature.</p>
+
+      <h2>Nos valeurs</h2>
+      <ul>
+        <li><strong>Transmission</strong> — Faire découvrir la nature au plus grand nombre, rendre la connaissance accessible à tous les âges.</li>
+        <li><strong>Respect</strong> — Protection et respect des sites naturels, promotion d'un tourisme responsable et durable.</li>
+        <li><strong>Innovation</strong> — La technologie au service d'un usage simple et utile, jamais comme une fin en soi.</li>
+        <li><strong>Engagement</strong> — Aider les acteurs locaux à valoriser un patrimoine souvent méconnu.</li>
+      </ul>
+
+      <h2>L'équipe fondatrice</h2>
+      <p>Isard est portée par cinq cofondateurs aux parcours complémentaires : Laura Lopez (CEO, ex-armée, coordination et rigueur), Khaled Aboubakar (CTO, créativité et innovation digitale), Gabriela Toro Manzano (Développement & Partenariats, ex-Jooks, experte parcours touristiques), Émilie Goba (Product Manager, psychologue de formation, analyse utilisateur) et Dominique-Emmanuelle Djamala (Marketing & Communication, stratégie digitale et community management).</p>
+      <p>Ensemble, nous combinons expertise terrain, compétences digitales et passion pour la nature. Tous pratiquent la randonnée régulièrement et comprennent les besoins réels des utilisateurs.</p>
+
+      <h2>Notre ambition</h2>
+      <p>Lancée en Occitanie, Isard a vocation à devenir la référence française, puis européenne, de la randonnée augmentée. Notre roadmap prévoit un déploiement national dès 2027, avec des traductions en anglais et espagnol pour accueillir les touristes internationaux. Nous développons également des partenariats avec les marques outdoor, les hébergeurs et les réseaux de stations vertes.</p>
+
+      <div class="info-box"><h4>Capital et financement</h4><p>Capital initial de 25 000 € complété par un prêt FOSTER de 25 000 €. Stratégie de réinvestissement intégral des premiers revenus et levée de fonds de 500 000 € prévue en année 2 pour accélérer le déploiement national.</p></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== CONTACT PAGE ==================== -->
+<div class="page" id="page-contact">
+<section class="subpage">
+  <div class="container"><div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">Contact</div><h2 class="stitle" style="text-align:center">Parlons <span class="a">ensemble</span></h2><p class="sdesc" style="margin:0 auto">Une question, une proposition de partenariat ou un simple bonjour ? On est là.</p></div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Nos coordonnées</h3>
+        <div class="contact-item"><div class="contact-icon">📍</div><div><p><strong>Adresse</strong></p><p class="cl">14 rue de la Randonnée<br>31000 Toulouse, France</p></div></div>
+        <div class="contact-item"><div class="contact-icon">📧</div><div><p><strong>Email</strong></p><p class="cl">contact@isard-app.fr</p></div></div>
+        <div class="contact-item"><div class="contact-icon">📞</div><div><p><strong>Téléphone</strong></p><p class="cl">+33 5 61 00 00 00</p></div></div>
+        <div class="contact-item"><div class="contact-icon">🕐</div><div><p><strong>Horaires</strong></p><p class="cl">Lundi — Vendredi : 9h00 – 18h00</p></div></div>
+        <h3 style="margin-top:24px">Suivez-nous</h3>
+        <p>Retrouvez-nous sur Instagram, Facebook, TikTok et LinkedIn pour suivre l'aventure Isard au quotidien.</p>
+      </div>
+      <div>
+        <form class="cform" onsubmit="event.preventDefault();handleContact(this)">
+          <label>Nom complet</label><input type="text" placeholder="Jean Dupont" required>
+          <label>Email</label><input type="email" placeholder="jean@exemple.fr" required>
+          <label>Sujet</label>
+          <select required><option value="">Choisir un sujet...</option><option>Question générale</option><option>Proposition de partenariat</option><option>Signaler un bug</option><option>Demande presse / média</option><option>Autre</option></select>
+          <label>Message</label><textarea placeholder="Votre message..." required></textarea>
+          <button type="submit" class="btn-p" style="justify-content:center">Envoyer le message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== ROADMAP PAGE ==================== -->
+<div class="page" id="page-roadmap">
+<section class="subpage">
+  <div class="container"><div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">Roadmap</div><h2 class="stitle" style="text-align:center">Notre <span class="a">feuille de route</span></h2><p class="sdesc" style="margin:0 auto">Découvrez les prochaines étapes du développement d'Isard et les fonctionnalités à venir.</p></div>
+    <div class="roadmap-timeline">
+      <div class="rm-item done r"><div class="rm-dot"></div><div class="rm-date">Mai 2026 — Lancement</div><h4>Version freemium</h4><p>Lancement de l'application avec les parcours pilotes en Occitanie. Navigation GPS, réalité augmentée de base, système de badges et premiers partenariats avec les offices de tourisme locaux.</p></div>
+      <div class="rm-item done r d1"><div class="rm-dot"></div><div class="rm-date">Été 2026 — Consolidation</div><h4>Extension régionale</h4><p>Ajout de nouveaux départements d'Occitanie. Campagnes ciblées auprès des clubs de randonnée, hébergeurs et stations vertes. Mise en place des challenges saisonniers et premiers partenariats privés.</p></div>
+      <div class="rm-item r d2"><div class="rm-dot"></div><div class="rm-date">Automne 2026</div><h4>Communauté & UGC</h4><p>Lancement du groupe Facebook « Les Explorateurs ISARD ». Intégration des contenus utilisateurs (photos, avis, suggestions de parcours). Concours automne avec goodies partenaires.</p></div>
+      <div class="rm-item r d3"><div class="rm-dot"></div><div class="rm-date">2027 — Développement</div><h4>Déploiement national</h4><p>Extension aux principaux massifs français (Alpes, Massif Central, Jura, Vosges). Nouvelle offre Premium : parcours personnalisés, pack famille avec contenus pédagogiques enfants, pack experts avec altimétrie avancée et météo intégrée.</p></div>
+      <div class="rm-item r d4"><div class="rm-dot"></div><div class="rm-date">2027 — International</div><h4>Traduction & expansion</h4><p>Traduction de l'application et des contenus en anglais et espagnol pour accueillir les touristes étrangers. Partenariats avec les tours operators et plateformes de réservation outdoor.</p></div>
+      <div class="rm-item r d5"><div class="rm-dot"></div><div class="rm-date">2028 — Vision</div><h4>Référence européenne</h4><p>Levée de fonds de 500 000 € pour accélérer l'expansion. Objectif : devenir la plateforme de référence pour la randonnée augmentée en Europe, avec des contenus dans 5 langues et une couverture de 10 pays.</p></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== GUIDE RANDONNÉE PAGE ==================== -->
+<div class="page" id="page-guide">
+<section class="subpage">
+  <div class="container"><div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">Guide</div><h2 class="stitle" style="text-align:center">Guide du <span class="a">randonneur</span></h2><p class="sdesc" style="margin:0 auto">Tout ce qu'il faut savoir pour profiter pleinement de vos sorties avec Isard.</p></div>
+    <div class="subpage-content">
+      <h2>Bien préparer sa randonnée</h2>
+      <p>Avant chaque sortie, consultez la météo et choisissez un parcours adapté à votre niveau. Avec Isard, vous pouvez filtrer les itinéraires par difficulté, durée et thématique. Téléchargez toujours le parcours en mode hors-ligne avant de partir — c'est la garantie de ne jamais être perdu, même sans réseau.</p>
+
+      <h3>L'équipement essentiel</h3>
+      <ul>
+        <li>Chaussures de randonnée adaptées au terrain (montagne, forêt, causse)</li>
+        <li>Sac à dos léger avec eau (minimum 1,5L), en-cas énergétiques et protection solaire</li>
+        <li>Vêtements en couches (même en été, la montagne peut surprendre)</li>
+        <li>Smartphone chargé avec l'application Isard téléchargée en hors-ligne</li>
+        <li>Batterie externe recommandée pour les longues sorties</li>
+        <li>Carte IGN papier en complément (sécurité supplémentaire)</li>
+      </ul>
+
+      <h3>Utiliser la réalité augmentée sur le terrain</h3>
+      <p>La fonctionnalité RA d'Isard fonctionne mieux en plein jour avec une bonne luminosité. Pointez votre caméra vers l'élément qui vous intéresse (plante, animal, bâtiment) et maintenez le téléphone stable pendant 2-3 secondes. L'identification s'affiche automatiquement avec la fiche descriptive complète.</p>
+
+      <h3>Respecter la nature</h3>
+      <ul>
+        <li>Restez sur les sentiers balisés pour protéger la végétation</li>
+        <li>Ne cueillez pas les plantes sauvages, photographiez-les plutôt</li>
+        <li>Emportez tous vos déchets (même les trognons de pomme)</li>
+        <li>Observez la faune à distance, ne la dérangez jamais</li>
+        <li>Respectez les zones protégées et les propriétés privées</li>
+        <li>Informez quelqu'un de votre itinéraire et de votre heure de retour prévue</li>
+      </ul>
+
+      <h3>Sécurité en montagne</h3>
+      <p>En montagne, les conditions peuvent changer rapidement. En cas d'orage, descendez immédiatement en altitude et éloignez-vous des crêtes et des arbres isolés. En cas d'urgence, appelez le 112 (numéro européen) ou le 114 (par SMS). Isard affiche votre position GPS précise que vous pourrez communiquer aux secours.</p>
+
+      <div class="info-box"><h4>Numéros d'urgence</h4><p>SAMU : 15 | Pompiers : 18 | Secours en montagne : 04 92 22 22 22 | Numéro européen : 112</p></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== SUPPORT PAGE ==================== -->
+<div class="page" id="page-support">
+<section class="subpage">
+  <div class="container"><div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">Support</div><h2 class="stitle" style="text-align:center">Centre <span class="a">d'aide</span></h2><p class="sdesc" style="margin:0 auto">Besoin d'aide ? Consultez nos guides ou contactez notre équipe.</p></div>
+    <div class="subpage-content">
+      <h2>Problèmes fréquents</h2>
+      <h3>L'application ne se lance pas</h3>
+      <p>Vérifiez que votre appareil est compatible (iOS 15+ ou Android 10+). Essayez de fermer l'application complètement et de la relancer. Si le problème persiste, désinstallez et réinstallez l'application depuis votre store.</p>
+
+      <h3>La RA ne fonctionne pas</h3>
+      <p>La réalité augmentée nécessite un appareil compatible ARKit (iOS) ou ARCore (Android). Assurez-vous d'avoir accordé les permissions d'accès à la caméra. La fonctionnalité RA fonctionne mieux en extérieur avec une bonne luminosité naturelle.</p>
+
+      <h3>Problème de téléchargement hors-ligne</h3>
+      <p>Le téléchargement de parcours nécessite une connexion Wi-Fi stable. Chaque parcours pèse entre 50 Mo et 200 Mo selon la richesse des contenus. Vérifiez que vous avez suffisamment d'espace de stockage disponible sur votre appareil.</p>
+
+      <h3>Problème de GPS</h3>
+      <p>Si le GPS est imprécis, assurez-vous que la géolocalisation est activée en mode « haute précision ». Redémarrez l'application si nécessaire. En zone de montagne avec couverture limitée, le mode hors-ligne utilise le GPS natif de votre téléphone, qui ne nécessite pas de connexion internet.</p>
+
+      <h3>Gestion de l'abonnement</h3>
+      <p>Pour modifier ou annuler votre abonnement Premium, rendez-vous dans les paramètres de votre compte dans l'application, ou directement dans les paramètres d'abonnement de votre App Store / Google Play Store. Les remboursements sont gérés par la plateforme de distribution (Apple ou Google).</p>
+
+      <div class="info-box"><h4>Contacter le support</h4><p>Email : support@isard-app.fr — Temps de réponse moyen : 24h en jours ouvrés. Pour les urgences terrain (sécurité), appelez toujours les secours au 112.</p></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== MENTIONS LÉGALES PAGE ==================== -->
+<div class="page" id="page-mentions">
+<section class="subpage">
+  <div class="container"><div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">Juridique</div><h2 class="stitle" style="text-align:center">Mentions <span class="a">légales</span></h2></div>
+    <div class="subpage-content">
+      <h2>1. Éditeur du site</h2>
+      <p>Le présent site internet est édité par la société ISARD SAS, société par actions simplifiée au capital de 25 000 euros, immatriculée au Registre du Commerce et des Sociétés de Toulouse sous le numéro RCS Toulouse XXX XXX XXX.</p>
+      <p><strong>Siège social :</strong> 14 rue de la Randonnée, 31000 Toulouse, France<br><strong>Numéro de TVA intracommunautaire :</strong> FR XX XXX XXX XXX<br><strong>Directrice de la publication :</strong> Laura Lopez, en qualité de Présidente<br><strong>Email :</strong> contact@isard-app.fr<br><strong>Téléphone :</strong> +33 5 61 00 00 00</p>
+
+      <h2>2. Hébergement</h2>
+      <p>Le site internet isard-app.fr est hébergé par la société OVHcloud, SAS au capital de 10 174 560 €, dont le siège social est situé au 2 rue Kellermann, 59100 Roubaix, France. Téléphone : 1007. Site web : <a href="https://www.ovhcloud.com">www.ovhcloud.com</a></p>
+
+      <h2>3. Propriété intellectuelle</h2>
+      <p>L'ensemble des contenus présents sur le site isard-app.fr (textes, images, graphismes, logo, icônes, vidéos, sons, logiciels, bases de données, etc.) est protégé par le droit d'auteur et le droit des marques, conformément aux dispositions du Code de la Propriété Intellectuelle.</p>
+      <p>Toute reproduction, représentation, modification, publication, adaptation ou exploitation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable d'ISARD SAS.</p>
+      <p>La marque ISARD, le logo associé et l'ensemble des marques figuratives ou non figuratives citées sur le site sont des marques déposées par ISARD SAS. Toute utilisation non autorisée de ces marques constitue une contrefaçon passible de sanctions pénales.</p>
+
+      <h2>4. Limitation de responsabilité</h2>
+      <p>ISARD SAS s'efforce de fournir des informations aussi précises que possible. Toutefois, elle ne pourra être tenue responsable des omissions, des inexactitudes et des carences dans la mise à jour, qu'elles soient de son fait ou du fait des tiers partenaires qui lui fournissent ces informations.</p>
+      <p>Les informations fournies par l'application Isard (itinéraires, identification de faune et flore, points d'intérêt) sont données à titre indicatif et ne sauraient remplacer le jugement de l'utilisateur, la prudence individuelle et les connaissances d'un guide professionnel. L'utilisateur reste seul responsable de sa sécurité sur le terrain.</p>
+
+      <h2>5. Liens hypertextes</h2>
+      <p>Le site isard-app.fr peut contenir des liens hypertextes vers d'autres sites internet. ISARD SAS n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu et leur accessibilité.</p>
+
+      <h2>6. Crédits</h2>
+      <p><strong>Conception et développement :</strong> ISARD SAS<br><strong>Design graphique :</strong> Khaled Aboubakar, Directeur Technique<br><strong>Photographies :</strong> Unsplash, partenaires locaux<br><strong>Cartographie :</strong> Données IGN, OpenStreetMap</p>
+
+      <h2>7. Droit applicable</h2>
+      <p>Les présentes mentions légales sont régies par le droit français. Tout litige relatif à l'utilisation du site isard-app.fr sera soumis à la compétence exclusive des tribunaux de Toulouse.</p>
+
+      <p style="margin-top:32px;font-size:.8rem;color:var(--gray)">Dernière mise à jour : 1er mai 2026</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== CONFIDENTIALITÉ PAGE ==================== -->
+<div class="page" id="page-confidentialite">
+<section class="subpage">
+  <div class="container"><div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">Juridique</div><h2 class="stitle" style="text-align:center">Politique de <span class="a">confidentialité</span></h2></div>
+    <div class="subpage-content">
+      <p>ISARD SAS (ci-après « Isard », « nous ») s'engage à protéger la vie privée de ses utilisateurs. Cette politique décrit comment nous collectons, utilisons, stockons et protégeons vos données personnelles conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés.</p>
+
+      <h2>1. Responsable du traitement</h2>
+      <p>ISARD SAS, 14 rue de la Randonnée, 31000 Toulouse, France. Contact DPO : dpo@isard-app.fr</p>
+
+      <h2>2. Données collectées</h2>
+      <h3>Données que vous nous fournissez</h3>
+      <ul>
+        <li>Informations de compte : nom, prénom, adresse email, mot de passe chiffré</li>
+        <li>Profil utilisateur : niveau de randonnée, préférences, photo de profil (optionnelle)</li>
+        <li>Contenus générés : photos, avis, suggestions de parcours</li>
+        <li>Données de paiement : traitées exclusivement par Apple / Google (nous ne stockons aucune donnée bancaire)</li>
+      </ul>
+      <h3>Données collectées automatiquement</h3>
+      <ul>
+        <li>Données de géolocalisation : position GPS lors de l'utilisation de l'application (uniquement lorsque l'application est active et avec votre consentement explicite)</li>
+        <li>Données d'usage : parcours effectués, badges obtenus, fonctionnalités utilisées</li>
+        <li>Données techniques : modèle d'appareil, version OS, identifiants techniques anonymisés</li>
+      </ul>
+
+      <h2>3. Finalités du traitement</h2>
+      <ul>
+        <li>Fournir et améliorer le service de navigation et de réalité augmentée</li>
+        <li>Personnaliser les recommandations de parcours</li>
+        <li>Gérer votre compte utilisateur et votre abonnement</li>
+        <li>Envoyer des communications relatives au service (avec votre consentement pour les newsletters)</li>
+        <li>Établir des statistiques anonymisées d'utilisation pour améliorer l'application</li>
+        <li>Assurer la sécurité et prévenir les fraudes</li>
+      </ul>
+
+      <h2>4. Base juridique</h2>
+      <p>Nous traitons vos données sur les bases juridiques suivantes : votre consentement (géolocalisation, newsletters), l'exécution du contrat (gestion du compte et de l'abonnement), notre intérêt légitime (amélioration du service, sécurité) et nos obligations légales (conservation comptable).</p>
+
+      <h2>5. Durée de conservation</h2>
+      <ul>
+        <li>Données de compte : conservées pendant la durée de votre inscription + 3 ans après suppression du compte</li>
+        <li>Données de géolocalisation : conservées 12 mois puis anonymisées</li>
+        <li>Données de paiement : aucune donnée bancaire stockée par Isard</li>
+        <li>Cookies et données techniques : 13 mois maximum</li>
+      </ul>
+
+      <h2>6. Partage des données</h2>
+      <p>Vos données personnelles ne sont jamais vendues à des tiers. Elles peuvent être partagées avec : nos sous-traitants techniques (hébergement, analyse), les autorités compétentes si la loi l'exige, et nos partenaires (uniquement des données anonymisées et agrégées pour améliorer les contenus territoriaux).</p>
+
+      <h2>7. Vos droits</h2>
+      <p>Conformément au RGPD, vous disposez des droits suivants : droit d'accès, de rectification, d'effacement (« droit à l'oubli »), de limitation du traitement, de portabilité des données, d'opposition au traitement, et de retrait de votre consentement à tout moment. Pour exercer ces droits, contactez-nous à : dpo@isard-app.fr</p>
+      <p>Vous disposez également du droit d'introduire une réclamation auprès de la CNIL (Commission Nationale de l'Informatique et des Libertés) : www.cnil.fr</p>
+
+      <h2>8. Sécurité</h2>
+      <p>Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données : chiffrement des données en transit (TLS) et au repos, accès restreint aux données personnelles, sauvegardes régulières, audits de sécurité périodiques.</p>
+
+      <h2>9. Cookies</h2>
+      <p>Le site isard-app.fr utilise des cookies essentiels au fonctionnement du site et des cookies analytiques (avec votre consentement) pour mesurer l'audience et améliorer l'expérience utilisateur. Vous pouvez gérer vos préférences cookies à tout moment via le bandeau de consentement ou les paramètres de votre navigateur.</p>
+
+      <h2>10. Modifications</h2>
+      <p>Cette politique peut être mise à jour périodiquement. Nous vous informerons de tout changement significatif par email ou notification dans l'application. La date de dernière mise à jour est indiquée ci-dessous.</p>
+
+      <p style="margin-top:32px;font-size:.8rem;color:var(--gray)">Dernière mise à jour : 1er mai 2026</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== CGU PAGE ==================== -->
+<div class="page" id="page-cgu">
+<section class="subpage">
+  <div class="container"><div class="back-btn" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</div>
+    <div class="subpage-header"><div class="slabel ctr">Juridique</div><h2 class="stitle" style="text-align:center">Conditions Générales <span class="a">d'Utilisation</span></h2></div>
+    <div class="subpage-content">
+      <p>Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») régissent l'utilisation de l'application mobile Isard et du site internet isard-app.fr (ci-après « le Service »), édités par ISARD SAS. En utilisant le Service, vous acceptez l'intégralité des présentes CGU.</p>
+
+      <h2>Article 1 — Objet</h2>
+      <p>Le Service Isard est une application mobile proposant des itinéraires de randonnée enrichis en réalité augmentée, l'identification de la faune et de la flore, des points d'intérêt géolocalisés et des modules pédagogiques interactifs. Le Service est disponible en version gratuite (freemium) et en version payante (Premium).</p>
+
+      <h2>Article 2 — Inscription et compte utilisateur</h2>
+      <p>L'utilisation du Service nécessite la création d'un compte. Vous vous engagez à fournir des informations exactes et à maintenir la confidentialité de vos identifiants. Vous êtes responsable de toute activité effectuée via votre compte. Vous devez avoir au moins 16 ans pour créer un compte. Les mineurs de moins de 16 ans doivent obtenir le consentement de leurs parents ou tuteurs légaux.</p>
+
+      <h2>Article 3 — Description des offres</h2>
+      <h3>Offre Gratuite</h3>
+      <ul>
+        <li>Accès à 3 parcours par mois</li>
+        <li>Navigation GPS de base</li>
+        <li>Identification RA limitée (10 identifications par jour)</li>
+        <li>Système de badges de découverte</li>
+        <li>Accès aux points d'intérêt principaux</li>
+      </ul>
+      <h3>Offre Premium — 4,99 € / mois</h3>
+      <ul>
+        <li>Parcours illimités</li>
+        <li>Réalité augmentée complète (faune, flore, patrimoine) sans limitation</li>
+        <li>Mode hors-ligne intégral</li>
+        <li>Création de parcours personnalisés</li>
+        <li>Pack Famille (contenus pédagogiques enfants)</li>
+        <li>Pack Expert (altimétrie avancée, météo intégrée)</li>
+        <li>Accès prioritaire aux nouvelles fonctionnalités</li>
+      </ul>
+
+      <h2>Article 4 — Abonnement et paiement</h2>
+      <p>L'abonnement Premium est facturé mensuellement via votre compte App Store (Apple) ou Google Play Store (Google). L'abonnement se renouvelle automatiquement sauf annulation au moins 24 heures avant la fin de la période en cours. Les prix peuvent être modifiés avec un préavis de 30 jours. Un essai gratuit de 14 jours est proposé aux nouveaux utilisateurs Premium.</p>
+
+      <h2>Article 5 — Droit de rétractation</h2>
+      <p>Conformément à l'article L.221-28 du Code de la consommation, le droit de rétractation ne s'applique pas aux contenus numériques fournis sur un support immatériel dont l'exécution a commencé avec votre accord. Pour les abonnements, vous pouvez annuler à tout moment ; le service reste actif jusqu'à la fin de la période payée.</p>
+
+      <h2>Article 6 — Obligations de l'utilisateur</h2>
+      <p>L'utilisateur s'engage à utiliser le Service conformément à sa destination, à ne pas diffuser de contenus illicites, diffamatoires ou portant atteinte aux droits de tiers, à respecter les sentiers et la réglementation des espaces naturels, et à ne pas tenter de décompiler, modifier ou contourner les protections techniques du Service.</p>
+
+      <h2>Article 7 — Responsabilité et sécurité</h2>
+      <p>Le Service est fourni « en l'état ». ISARD SAS ne garantit pas l'exactitude absolue des informations fournies (itinéraires, identification d'espèces, conditions de terrain). L'utilisateur reste seul responsable de sa sécurité lors de ses randonnées. Le Service ne se substitue en aucun cas à un guide professionnel, une carte IGN ou le bon sens du randonneur. ISARD SAS ne pourra être tenue responsable en cas d'accident survenu lors de l'utilisation du Service.</p>
+
+      <h2>Article 8 — Propriété intellectuelle</h2>
+      <p>Le Service et l'ensemble de ses contenus (logiciel, base de données, textes, images, sons) sont protégés par le droit de la propriété intellectuelle. Les contenus générés par les utilisateurs (photos, avis) restent leur propriété, mais l'utilisateur accorde à ISARD SAS une licence non exclusive, gratuite et mondiale pour les utiliser dans le cadre du Service.</p>
+
+      <h2>Article 9 — Suspension et résiliation</h2>
+      <p>ISARD SAS se réserve le droit de suspendre ou supprimer un compte en cas de violation des présentes CGU, de comportement nuisible à la communauté ou d'utilisation frauduleuse du Service. L'utilisateur peut supprimer son compte à tout moment depuis les paramètres de l'application.</p>
+
+      <h2>Article 10 — Modification des CGU</h2>
+      <p>ISARD SAS se réserve le droit de modifier les présentes CGU. Les utilisateurs seront informés de toute modification par email ou notification dans l'application. La poursuite de l'utilisation du Service après modification vaut acceptation des nouvelles CGU.</p>
+
+      <h2>Article 11 — Droit applicable et juridiction</h2>
+      <p>Les présentes CGU sont régies par le droit français. Tout litige sera soumis aux tribunaux compétents de Toulouse, sous réserve des dispositions impératives du droit de la consommation en matière de compétence juridictionnelle.</p>
+
+      <h2>Article 12 — Médiation</h2>
+      <p>Conformément aux articles L.616-1 et R.616-1 du Code de la consommation, en cas de litige non résolu, vous pouvez recourir gratuitement au service de médiation de la consommation. Le médiateur peut être saisi dans un délai d'un an à compter de la réclamation écrite adressée à ISARD SAS.</p>
+
+      <p style="margin-top:32px;font-size:.8rem;color:var(--gray)">Dernière mise à jour : 1er mai 2026</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== FOOTER (shared) ==================== -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><a class="nav-logo" data-nav="home"><div class="logo-icon"><img src="https://i.postimg.cc/28hLgdtg/Black-White-Minimal-Simple-Bold-Modern-Professional-Photography-Letter-K-Museum-Logo-(1).png" alt="Isard logo"></div>isard</a><p>L'application qui transforme chaque randonnée en expérience immersive. En plein cœur de l'Occitanie.</p><div class="footer-soc"><a class="footer-so">in</a><a class="footer-so">ig</a><a class="footer-so">fb</a><a class="footer-so">tk</a></div></div>
+    <div class="footer-col"><h5>Produit</h5><a data-nav="home" data-scroll="features">Fonctionnalités</a><a data-nav="home" data-scroll="pricing">Tarifs</a><a data-nav="parcours">Parcours</a><a data-nav="roadmap">Roadmap</a></div>
+    <div class="footer-col"><h5>Ressources</h5><a data-nav="blog">Blog</a><a data-nav="guide">Guide randonnée</a><a data-nav="faq">FAQ</a><a data-nav="support">Support</a></div>
+    <div class="footer-col"><h5>Entreprise</h5><a data-nav="about">À propos</a><a data-nav="home" data-scroll="team">L'équipe</a><a data-nav="contact">Contact</a></div>
+  </div>
+  <div class="footer-bot"><p>© 2026 Isard SAS. Tous droits réservés. Fait avec passion en Occitanie.</p><div class="flinks"><a data-nav="mentions">Mentions légales</a><a data-nav="confidentialite">Confidentialité</a><a data-nav="cgu">CGU</a></div></div>
+</footer>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+// Cursor
+const glow=document.getElementById('cursorGlow');let mx=-500,my=-500;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function ag(){glow.style.left=mx+'px';glow.style.top=my+'px';requestAnimationFrame(ag)})();
+
+// Particles
+const pc=document.getElementById('particles');
+for(let i=0;i<35;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;width:${1.5+Math.random()*3}px;height:${1.5+Math.random()*3}px;animation-delay:${Math.random()*10}s;animation-duration:${7+Math.random()*8}s`;pc.appendChild(p)}
+
+// Nav scroll
+const nav=document.getElementById('navbar');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>60),{passive:true});
+
+// Hamburger
+const hb=document.getElementById('hamburger'),mm=document.getElementById('mobileMenu');
+hb.addEventListener('click',()=>{hb.classList.toggle('active');mm.classList.toggle('open');document.body.style.overflow=mm.classList.contains('open')?'hidden':''});
+
+// ===== SPA ROUTING =====
+function navigateTo(page, scrollTarget) {
+  // Close mobile menu
+  hb.classList.remove('active');mm.classList.remove('open');document.body.style.overflow='';
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  // Show target page
+  const target=document.getElementById('page-'+page);
+  if(target)target.classList.add('active');
+  // Scroll
+  if(scrollTarget){
+    setTimeout(()=>{const el=document.getElementById(scrollTarget);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})},50);
+  } else {
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  // Re-init reveals for new page
+  setTimeout(initReveals,100);
+}
+
+// Bind all nav links
+document.querySelectorAll('[data-nav]').forEach(el=>{
+  el.addEventListener('click',e=>{
+    e.preventDefault();
+    navigateTo(el.dataset.nav, el.dataset.scroll||null);
+  });
+});
+
+// Scroll reveal
+function initReveals(){
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('v')})},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.r:not(.v),.rl:not(.v),.rr:not(.v),.rs:not(.v)').forEach(el=>obs.observe(el));
+}
+initReveals();
+
+// Counter animation
+function animNum(el,target,suffix){const dur=1500,start=performance.now();function tick(now){const p=Math.min((now-start)/dur,1);el.textContent=Math.round(target*(1-Math.pow(1-p,3)))+suffix;if(p<1)requestAnimationFrame(tick)}requestAnimationFrame(tick)}
+const cObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting&&!e.target.dataset.done){e.target.dataset.done='1';e.target.querySelectorAll('.num').forEach(n=>animNum(n,+n.dataset.target,n.dataset.suffix||''))}})},{threshold:.5});
+document.querySelectorAll('.hero-stats').forEach(el=>cObs.observe(el));
+
+// Steps line
+const slF=document.getElementById('stepsLineFill');
+if(slF){const sObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)slF.classList.add('anim')})},{threshold:.3});sObs.observe(slF.parentElement)}
+
+// Parallax
+let ticking=false;
+window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(()=>{const sy=scrollY;const m1=document.getElementById('mtn1'),m2=document.getElementById('mtn2'),m3=document.getElementById('mtn3');
+if(m1)m1.style.transform=`translateY(${sy*.05}px)`;if(m2)m2.style.transform=`translateY(${sy*.1}px)`;if(m3)m3.style.transform=`translateY(${sy*.15}px)`;
+const ph=document.getElementById('phoneParallax');if(ph){const r=ph.getBoundingClientRect();ph.style.transform=`translateY(${(innerHeight/2-(r.top+r.height/2))*.04}px)`}
+ticking=false});ticking=true}},{passive:true});
+
+// FAQ
+document.querySelectorAll('[data-faq]').forEach(item=>{item.querySelector('.faq-q').addEventListener('click',()=>{const was=item.classList.contains('open');item.closest('.faq-list').querySelectorAll('[data-faq]').forEach(i=>i.classList.remove('open'));if(!was)item.classList.add('open')})});
+
+// Newsletter
+function handleNews(f){const b=f.querySelector('.news-btn'),i=f.querySelector('.news-in');b.textContent='✓ Inscrit !';b.style.background='#88cc00';i.value='';setTimeout(()=>{b.textContent="S'inscrire";b.style.background=''},3000)}
+
+// Contact
+function handleContact(f){const b=f.querySelector('.btn-p');b.textContent='✓ Message envoyé !';b.style.background='#88cc00';setTimeout(()=>{b.textContent='Envoyer le message';b.style.background='';f.reset()},3000)}
+</script>
+</body>
+</html>
