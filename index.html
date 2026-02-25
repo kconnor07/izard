@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
-<style>
+<style
 *,::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{--lime:#CCFF00;--lime-d:#a8d400;--black:#010101;--white:#FDFDFD;--dark:#080808;--d2:#0f0f0f;--d3:#161616;--d4:#1c1c1c;--gray:#777;--gl:#999;--ld:rgba(204,255,0,0.1);--lg:rgba(204,255,0,0.25);--r:20px;--t:cubic-bezier(0.16,1,0.3,1)}
 html{scroll-behavior:smooth}
@@ -64,7 +64,7 @@ section{padding:120px 32px;position:relative}
 .btn-g:hover{border-color:var(--lime);color:var(--lime);background:rgba(204,255,0,0.04);transform:translateY(-2px)}
 .page{display:none}
 .page.active{display:block}
-.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:140px 32px 60px;overflow:hidden}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:140px 32px 60px;overflow:visible;position:relative}
 .hero-orb{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(204,255,0,0.12),rgba(204,255,0,0.02) 60%,transparent 80%);top:50%;left:50%;transform:translate(-50%,-50%);animation:orb 8s ease-in-out infinite;filter:blur(60px)}
 @keyframes orb{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.15);opacity:1}}
 .particles{position:absolute;inset:0;z-index:1;overflow:hidden}
@@ -91,7 +91,7 @@ section{padding:120px 32px;position:relative}
 .hero-stats{display:flex;justify-content:center;gap:56px;margin-top:72px;padding-top:36px;border-top:1px solid rgba(255,255,255,0.05);opacity:0;animation:fu .8s .85s var(--t) forwards}
 .hero-stat .num{font-size:2.4rem;font-weight:900;color:var(--lime);letter-spacing:-.03em;font-family:'Playfair Display',serif}
 .hero-stat .label{font-size:.75rem;color:var(--gray);margin-top:2px}
-.scroll-ind{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fu .8s 1.2s var(--t) forwards}
+.scroll-ind{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fu .8s 1.2s var(--t) forwards;margin-top:24px;padding-bottom:16px}
 .scroll-ind span{font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--gray)}
 .scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--lime),transparent);animation:sl 2s infinite}
 @keyframes sl{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
@@ -321,7 +321,7 @@ footer{background:var(--black);padding:56px 32px 28px;border-top:1px solid rgba(
 }
 @media(max-width:768px){
 section{padding:80px 20px}nav{padding:14px 20px}.nav-links{display:none}.hamburger{display:flex}
-.hero{padding:120px 20px 60px}.hero h1{font-size:clamp(2.2rem,8vw,3.2rem)}.hero-stats{flex-direction:column;gap:16px;align-items:center}
+.hero{padding:120px 20px 60px;min-height:auto;overflow:visible}.hero h1{font-size:clamp(2.2rem,8vw,3.2rem)}.hero-stats{flex-direction:column;gap:16px;align-items:center}
 .fgrid{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.terr-grid{grid-template-columns:1fr;max-width:400px;margin:0 auto}
 .team-grid{grid-template-columns:repeat(2,1fr)}.test-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}
 .price-grid{grid-template-columns:1fr;max-width:400px;margin:0 auto}
@@ -345,7 +345,7 @@ section{padding:80px 20px}nav{padding:14px 20px}.nav-links{display:none}.hamburg
     <li><a data-nav="home" data-scroll="team">Équipe</a></li>
     <li><a data-nav="home" data-scroll="pricing">Tarifs</a></li>
     <li><a data-nav="faq">FAQ</a></li>
-    <li class="ncta"><a data-nav="home" data-scroll="download"><span>Télécharger</span></a></li>
+    <li class="ncta"><a href="https://kconnor07.github.io/izardapp/" data-nav="home" data-scroll="download"><span>Télécharger</span></a></li>
   </ul>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
@@ -356,7 +356,7 @@ section{padding:80px 20px}nav{padding:14px 20px}.nav-links{display:none}.hamburg
   <a data-nav="home" data-scroll="team" class="mm">Équipe</a>
   <a data-nav="home" data-scroll="pricing" class="mm">Tarifs</a>
   <a data-nav="faq" class="mm">FAQ</a>
-  <a data-nav="home" data-scroll="download" class="mm mcta">Télécharger</a>
+  <a href="https://kconnor07.github.io/izardapp/" data-nav="home" data-scroll="download" class="mm mcta">Télécharger</a>
 </div>
 <div class="page active" id="page-home">
 <section class="hero" id="hero">
@@ -372,7 +372,7 @@ section{padding:80px 20px}nav{padding:14px 20px}.nav-links{display:none}.hamburg
     <h1><span class="hl"><span class="hli">La nature prend une</span></span><span class="hl"><span class="hli">autre <span class="hi">dimension.</span></span></span></h1>
     <p class="hero-sub">Isard transforme chaque randonnée en expérience immersive grâce à la réalité augmentée. Faune, flore, patrimoine, l’Occitanie prend vie sous vos yeux.</p>
     <div class="hero-actions">
-      <a class="btn-p" data-nav="home" data-scroll="download">Découvrir l’app <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a class="btn-p" href="https://kconnor07.github.io/izardapp/" data-nav="home" data-scroll="download">Découvrir l’app <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
       <a class="btn-g" data-nav="home" data-scroll="features">Comment ça marche</a>
     </div>
     <div class="hero-stats">
@@ -494,10 +494,10 @@ section{padding:80px 20px}nav{padding:14px 20px}.nav-links{display:none}.hamburg
   <div class="cta-glow"></div>
   <div class="cta-c">
     <div class="slabel ctr r">Prêt à explorer ?</div><h2 class="stitle r d1" style="text-align:center">Votre prochaine randonnée<br>sera <span class="a">inoubliable</span></h2><p class="sdesc r d2" style="margin:0 auto 40px">Rejoignez les explorateurs qui redécouvrent l’Occitanie. Téléchargez gratuitement.</p>
-    <div style="display:flex;justify-content:center" class="r d3"><a class="btn-p" style="font-size:1.05rem;padding:18px 44px">Télécharger Isard <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a></div>
+    <div style="display:flex;justify-content:center" class="r d3"><a class="btn-p" href="https://kconnor07.github.io/izardapp/" style="font-size:1.05rem;padding:18px 44px">Télécharger Isard <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a></div>
     <div class="store-badges r d4">
-      <a class="store-badge"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><div class="stxt"><div class="sm">Télécharger sur l’</div><div class="bg">App Store</div></div></a>
-      <a class="store-badge"><svg viewBox="0 0 24 24"><path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.61 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/></svg><div class="stxt"><div class="sm">Disponible sur</div><div class="bg">Google Play</div></div></a>
+      <a class="store-badge" href="https://kconnor07.github.io/izardapp/"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><div class="stxt"><div class="sm">Télécharger sur l’</div><div class="bg">App Store</div></div></a>
+      <a class="store-badge" href="https://kconnor07.github.io/izardapp/"><svg viewBox="0 0 24 24"><path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.61 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/></svg><div class="stxt"><div class="sm">Disponible sur</div><div class="bg">Google Play</div></div></a>
     </div>
   </div>
 </section>
