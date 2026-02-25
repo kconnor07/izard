@@ -196,13 +196,22 @@ section{padding:120px 32px;position:relative}
 .tst-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--lime),#88cc00);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--black)}
 .tst-i .n{font-size:.82rem;font-weight:600}.tst-i .d{font-size:.68rem;color:var(--gray)}
 .price-s{background:var(--d2)}
-.price-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.price-toggle{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:48px}
+.price-toggle span{font-size:.9rem;font-weight:500;color:var(--gray);transition:color .3s}
+.price-toggle span.active{color:var(--white)}
+.toggle-switch{width:52px;height:28px;background:var(--d3);border-radius:50px;cursor:pointer;position:relative;border:1px solid rgba(255,255,255,0.1);transition:background .3s}
+.toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:var(--lime);border-radius:50%;transition:transform .3s}
+.toggle-switch.annual::after{transform:translateX(24px)}
+.toggle-switch.annual{background:rgba(204,255,0,0.15);border-color:var(--lime)}
+.price-save{background:rgba(204,255,0,0.1);color:var(--lime);padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
+.price-grid{max-width:820px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
 .pcard{background:var(--d3);border-radius:24px;padding:44px 36px;border:1px solid rgba(255,255,255,0.03);transition:all .4s var(--t);position:relative}
 .pcard.pop{border-color:var(--lime);background:linear-gradient(165deg,rgba(204,255,0,0.05),var(--d3) 50%)}
 .pcard.pop::after{content:'Populaire';position:absolute;top:-11px;right:20px;background:var(--lime);color:var(--black);padding:4px 16px;border-radius:20px;font-size:.68rem;font-weight:700}
 .pcard:hover{transform:translateY(-4px)}
 .pn{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:10px}
 .pa{font-size:3rem;font-weight:900;letter-spacing:-.03em;margin-bottom:6px;font-family:'Playfair Display',serif}.pa span{font-size:.95rem;font-weight:400;color:var(--gray);font-family:'Poppins',sans-serif}
+.pa .price-old{text-decoration:line-through;font-size:1.2rem;color:var(--gray);font-weight:400;margin-right:8px}
 .pd{font-size:.82rem;color:var(--gray);margin-bottom:28px;font-weight:300}
 .pl{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
 .pl li{display:flex;align-items:center;gap:10px;font-size:.85rem}
@@ -324,7 +333,7 @@ section{padding:80px 20px}nav{padding:14px 20px}.nav-links{display:none}.hamburg
 .hero{padding:120px 20px 60px;min-height:auto;overflow:visible}.hero h1{font-size:clamp(2.2rem,8vw,3.2rem)}.hero-stats{flex-direction:column;gap:16px;align-items:center}
 .fgrid{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.terr-grid{grid-template-columns:1fr;max-width:400px;margin:0 auto}
 .team-grid{grid-template-columns:repeat(2,1fr)}.test-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}
-.price-grid{grid-template-columns:1fr;max-width:400px;margin:0 auto}
+.price-grid{grid-template-columns:1fr;max-width:440px;margin:0 auto}
 .news-form{flex-direction:column}.store-badges{flex-direction:column;align-items:center}
 .footer-grid{grid-template-columns:1fr;gap:28px}.footer-bot{flex-direction:column;gap:12px;text-align:center}
 .show-s{padding:80px 20px}.part-logos{gap:20px}.cursor-glow{display:none}
@@ -473,10 +482,10 @@ section{padding:80px 20px}nav{padding:14px 20px}.nav-links{display:none}.hamburg
 <section class="price-s" id="pricing">
   <div class="container">
     <div style="text-align:center;margin-bottom:56px"><div class="slabel ctr r">Tarifs</div><h2 class="stitle r d1" style="text-align:center">Commencez gratuitement.<br>Évoluez à votre <span class="a">rythme</span></h2><p class="sdesc r d2" style="margin:0 auto">Le gratuit donne accès à l’essentiel. Le Premium débloque tout le potentiel.</p></div>
+    <div class="price-toggle r d1"><span class="active" id="togMonthLabel">Mensuel</span><div class="toggle-switch" id="priceToggle" onclick="togglePricing()"></div><span id="togYearLabel">Annuel</span><span class="price-save">−29%</span></div>
     <div class="price-grid">
-      <div class="pcard r"><div class="pn">Mensuel</div><div class="pa">6,99€ <span>/ mois</span></div><div class="pd">Accès complet, sans engagement. Résiliable à tout moment.</div><ul class="pl"><li><span class="pc">✓</span>Parcours illimités</li><li><span class="pc">✓</span>RA complète faune, flore, patrimoine</li><li><span class="pc">✓</span>Mode hors-ligne intégral</li><li><span class="pc">✓</span>Parcours personnalisés</li><li><span class="pc">✓</span>Pack famille & experts</li><li><span class="pc">✓</span>Altimétrie avancée & météo</li></ul><button class="pbtn o">Choisir mensuel</button></div>
-    <div class="pcard pop r d1"><div class="pn">Annuel</div><div class="pa">59,99€ <span>/ an</span></div><div class="pd">Le meilleur rapport qualité-prix. Économisez 29% par rapport au mensuel.</div><ul class="pl"><li><span class="pc">✓</span>Parcours illimités</li><li><span class="pc">✓</span>RA complète faune, flore, patrimoine</li><li><span class="pc">✓</span>Mode hors-ligne intégral</li><li><span class="pc">✓</span>Parcours personnalisés</li><li><span class="pc">✓</span>Pack famille & experts</li><li><span class="pc">✓</span>Altimétrie avancée & météo</li></ul><button class="pbtn f">Choisir annuel — Économisez 29%</button></div>
-    <div class="pcard r d2"><div class="pn">Gratuit</div><div class="pa">0€</div><div class="pd">Découvrez Isard et ses fonctions essentielles.</div><ul class="pl"><li><span class="pc">✓</span>3 parcours par mois</li><li><span class="pc">✓</span>Navigation GPS de base</li><li><span class="pc">✓</span>Identification RA limitée</li><li><span class="pc">✓</span>Badges de découverte</li><li><span class="pc">✓</span>Points d'intérêt principaux</li></ul><button class="pbtn o">Commencer gratuitement</button></div>
+      <div class="pcard r"><div class="pn">Gratuit</div><div class="pa">0€</div><div class="pd">Découvrez Isard et ses fonctions essentielles.</div><ul class="pl"><li><span class="pc">✓</span>3 parcours par mois</li><li><span class="pc">✓</span>Navigation GPS de base</li><li><span class="pc">✓</span>Identification RA limitée</li><li><span class="pc">✓</span>Badges de découverte</li><li><span class="pc">✓</span>Points d’intérêt principaux</li></ul><button class="pbtn o">Commencer gratuitement</button></div>
+      <div class="pcard pop r d1"><div class="pn">Premium</div><div class="pa" id="premiumPrice">6,99€ <span>/ mois</span></div><div class="pd" id="premiumDesc">Accès complet, sans engagement. Résiliable à tout moment.</div><ul class="pl"><li><span class="pc">✓</span>Parcours illimités</li><li><span class="pc">✓</span>RA complète faune, flore, patrimoine</li><li><span class="pc">✓</span>Mode hors-ligne intégral</li><li><span class="pc">✓</span>Parcours personnalisés</li><li><span class="pc">✓</span>Pack famille & experts</li><li><span class="pc">✓</span>Altimétrie avancée & météo</li></ul><button class="pbtn f" id="premiumBtn">Choisir mensuel</button></div>
     </div>
   </div>
 </section>
@@ -766,6 +775,8 @@ function initReveals(){
   document.querySelectorAll('.r:not(.v),.rl:not(.v),.rr:not(.v),.rs:not(.v)').forEach(el=>obs.observe(el));
 }
 initReveals();
+
+function togglePricing(){const t=document.getElementById('priceToggle'),ml=document.getElementById('togMonthLabel'),yl=document.getElementById('togYearLabel'),price=document.getElementById('premiumPrice'),desc=document.getElementById('premiumDesc'),btn=document.getElementById('premiumBtn');const isAnnual=!t.classList.contains('annual');if(isAnnual){t.classList.add('annual');ml.classList.remove('active');yl.classList.add('active');price.innerHTML='59,99\u20ac <span>/ an</span>';desc.textContent='Le meilleur rapport qualit\u00e9-prix. \u00c9conomisez 29% par rapport au mensuel.';btn.textContent='Choisir annuel \u2014 \u00c9conomisez 29%'}else{t.classList.remove('annual');ml.classList.add('active');yl.classList.remove('active');price.innerHTML='6,99\u20ac <span>/ mois</span>';desc.textContent='Acc\u00e8s complet, sans engagement. R\u00e9siliable \u00e0 tout moment.';btn.textContent='Choisir mensuel'}}
 function animNum(el,target,suffix){const dur=1500,start=performance.now();function tick(now){const p=Math.min((now-start)/dur,1);el.textContent=Math.round(target*(1-Math.pow(1-p,3)))+suffix;if(p<1)requestAnimationFrame(tick)}requestAnimationFrame(tick)}
 const cObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting&&!e.target.dataset.done){e.target.dataset.done='1';e.target.querySelectorAll('.num').forEach(n=>animNum(n,+n.dataset.target,n.dataset.suffix||''))}})},{threshold:.5});
 document.querySelectorAll('.hero-stats').forEach(el=>cObs.observe(el));
